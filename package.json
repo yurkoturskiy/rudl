@@ -1,0 +1,37 @@
+{
+  "name": "react-universal-dnd-layout",
+  "version": "0.1.0",
+  "description": "Drag and drop for lists, tiles and masonry layouts",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "./node_modules/.bin/babel src --out-file index.js"
+  },
+  "keywords": [
+    "react",
+    "layout",
+    "dnd",
+    "masonry",
+    "lists",
+    "cards",
+    "drag",
+    "drop"
+  ],
+  "author": "Yurko Turskiy",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "prop-types": "^15.7.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.5.0",
+    "@babel/core": "^7.5.4",
+    "@babel/preset-env": "^7.5.4",
+    "@babel/preset-react": "^7.0.0",
+    "prop-types": "^15.7.2",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
+  },
+  "dependencies": {}
+}
