@@ -7,6 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "./node_modules/.bin/babel src --out-file index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guandjoy/react-universal-dnd-layout.git"
+  },
   "keywords": [
     "react",
     "layout",
@@ -33,5 +37,9 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "bugs": {
+    "url": "https://github.com/guandjoy/react-universal-dnd-layout/issues"
+  },
+  "homepage": "https://github.com/guandjoy/react-universal-dnd-layout#readme"
 }
