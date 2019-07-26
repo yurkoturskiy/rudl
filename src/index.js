@@ -246,7 +246,7 @@ function DraggableMasonryLayout(props) {
     ) {
       // console.log("call on rearrange func");
       props.onRearrange &&
-        props.onRearrange(items[dragItemIndex], dragItemNewOrder);
+        props.onRearrange(items[dragItemIndex], dragItemNewOrder, items);
       setDragItemPrevOrder(undefined);
       setDragItemNewOrder(undefined);
     }

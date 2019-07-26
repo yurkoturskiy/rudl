@@ -352,7 +352,7 @@ function DraggableMasonryLayout(props) {
   (0, _react.useEffect)(function () {
     if (dragItemPrevOrder !== undefined && dragItemNewOrder !== undefined && dragItemNewOrder !== dragItemPrevOrder && !drag) {
       // console.log("call on rearrange func");
-      props.onRearrange && props.onRearrange(items[dragItemIndex], dragItemNewOrder);
+      props.onRearrange && props.onRearrange(items[dragItemIndex], dragItemNewOrder, items);
       setDragItemPrevOrder(undefined);
       setDragItemNewOrder(undefined);
     }
