@@ -692,7 +692,13 @@ function DraggableMasonryLayout(props) {
   return _react["default"].createElement("div", {
     className: "masonry",
     ref: masonryLayout
-  }, _react["default"].createElement("div", {
+  }, props.header && layoutIsMount && _react["default"].createElement("div", {
+    style: {
+      position: "relative",
+      width: "".concat(layout.width, "px"),
+      margin: "0 auto 0 auto"
+    }
+  }, props.header), _react["default"].createElement("div", {
     style: {
       position: "relative",
       width: "".concat(layout.width, "px"),

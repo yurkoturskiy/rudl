@@ -563,6 +563,17 @@ function DraggableMasonryLayout(props) {
 
   return (
     <div className="masonry" ref={masonryLayout}>
+      {props.header && layoutIsMount && (
+        <div
+          style={{
+            position: "relative",
+            width: `${layout.width}px`,
+            margin: "0 auto 0 auto"
+          }}
+        >
+          {props.header}
+        </div>
+      )}
       <div
         style={{
           position: "relative",
