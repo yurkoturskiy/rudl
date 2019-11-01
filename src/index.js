@@ -7,7 +7,8 @@ function Ghost(props) {
       style={{
         position: "fixed",
         visibility: "visible",
-        transform: `translate(${props.x}px, ${props.y}px)`
+        transform: `translate(${props.x}px, ${props.y}px)`,
+        pointerEvents: "none"
       }}
     >
       {props.children}
