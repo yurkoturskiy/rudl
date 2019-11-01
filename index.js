@@ -674,7 +674,6 @@ function DraggableMasonryLayout(props) {
         position: "absolute",
         margin: 0,
         padding: 0,
-        touchAction: "none",
         userSelect: "none",
         top: "".concat(layout.elements[index] ? layout.elements[index].y : 0, "px"),
         left: "".concat(layout.elements[index] ? layout.elements[index].x : 0, "px"),
