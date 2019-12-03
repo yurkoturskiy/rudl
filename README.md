@@ -1,3 +1,9 @@
-# react-universal-dnd-layout
+# RUDL
+React Universal DnD Layout
 
-Drag and drop for lists, tiles and masonry layouts
+## Donation :two_hearts:
+
+Your donations will help to develop RUDL faster. Please support :blush:
+
+Bitcoin wallet: `19fxW81ApuCbAu2tW8WebxRQqaoje6YbhJ`
+
