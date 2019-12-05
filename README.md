@@ -1,6 +1,12 @@
 # RUDL
 React Universal DnD Layout
 
+## Install
+
+```shell
+npm install --save rudl
+```
+
 ## Donation :two_hearts:
 
 Your donations will help to develop RUDL faster. Please support :blush:
