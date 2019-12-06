@@ -5,9 +5,42 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+var _react = _interopRequireDefault(require("react"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function Ghost(props) {
+  var ghostTransitionDuration = props.ghostTransitionDuration,
+      ghostTransitionTimingFunction = props.ghostTransitionTimingFunction;
+  return _react["default"].createElement("div", {
+    style: {
+      position: "fixed",
+      visibility: "visible",
+      left: props.x,
+      top: props.y,
+      pointerEvents: "none",
+      transition: props.drag ? "none" : "left ".concat(ghostTransitionDuration, "ms ").concat(ghostTransitionTimingFunction, ", top ").concat(ghostTransitionDuration, "ms ").concat(ghostTransitionTimingFunction)
+    },
+    onTransitionEnd: function onTransitionEnd() {
+      return props.onGhostEndTransition();
+    }
+  }, props.children);
+}
+
+var _default = Ghost;
+exports["default"] = _default;
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
 var _react = _interopRequireWildcard(require("react"));
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _Ghost = _interopRequireDefault(require("./Ghost"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -29,24 +62,24 @@ function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = 
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-function Ghost(props) {
-  return _react["default"].createElement("div", {
-    style: {
-      position: "fixed",
-      visibility: "visible",
-      transform: "translate(".concat(props.x, "px, ").concat(props.y, "px)"),
-      pointerEvents: "none"
-    }
-  }, props.children);
-} //////////////////////////////
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//////////////////////////////
 
 /* Masonry layout component */
 //////////////////////////////
-
-
-var longPress;
+var longPress, press, ghostTimeout;
 
 function DraggableMasonryLayout(props) {
+  var transitionTimingFunction = props.transitionTimingFunction,
+      transitionDuration = props.transitionDuration,
+      ghostTransitionDuration = props.ghostTransitionDuration,
+      ghostTransitionTimingFunction = props.ghostTransitionTimingFunction;
+
   var generateItems = function generateItems() {
     return _react["default"].Children.map(props.children, function (child, index) {
       if (child.props.separator) {
@@ -64,7 +97,9 @@ function DraggableMasonryLayout(props) {
         id: child.key,
         order: child.props.order,
         separator: child.props.separator,
-        element: _react["default"].cloneElement(child, {
+        width: child.props.width,
+        height: child.props.height,
+        element: _react["default"].cloneElement(child, _objectSpread({}, child.props, {
           draggableItem: {
             onMouseDown: function onMouseDown(e) {
               return _onMouseDown(e, index);
@@ -81,10 +116,14 @@ function DraggableMasonryLayout(props) {
             onTouchMove: function onTouchMove(e) {
               return _onTouchMove(e, index);
             },
-            onTouchEnd: onTouchEnd,
-            onClick: onClickEvent
+            onTouchEnd: function onTouchEnd(e) {
+              return _onTouchEnd();
+            },
+            onClick: function onClick(e) {
+              return onClickEvent();
+            }
           }
-        })
+        }))
       };
     });
   }; // General
@@ -195,7 +234,23 @@ function DraggableMasonryLayout(props) {
   var _useState37 = (0, _react.useState)(),
       _useState38 = _slicedToArray(_useState37, 2),
       ghostPos = _useState38[0],
-      setGhostPos = _useState38[1]; /////////////////////
+      setGhostPos = _useState38[1];
+
+  var _useState39 = (0, _react.useState)(),
+      _useState40 = _slicedToArray(_useState39, 2),
+      ghostSourceId = _useState40[0],
+      setGhostSourceId = _useState40[1]; // Body
+
+
+  var _useState41 = (0, _react.useState)(),
+      _useState42 = _slicedToArray(_useState41, 2),
+      bodyDefaultOverflow = _useState42[0],
+      setBodyDefaultOverflow = _useState42[1];
+
+  var _useState43 = (0, _react.useState)(),
+      _useState44 = _slicedToArray(_useState43, 2),
+      bodyDefaultOverscrollBehaviorY = _useState44[0],
+      setBodyDefaultOverscrollBehaviorY = _useState44[1]; /////////////////////
 
   /* Events' methods */
   /////////////////////
@@ -274,17 +329,20 @@ function DraggableMasonryLayout(props) {
     setDrag(false);
     setDragPoint(undefined);
     setDragItemIndex(undefined);
-    setOverItemIndex(undefined); // setCursorPos(undefined);
-
-    setGhost(undefined);
-    setGhostPos(undefined); // Log
+    setOverItemIndex(undefined); // Log
 
     setUILog("cleanup");
-  }; //////////////////////////
+  };
+
+  (0, _react.useEffect)(function () {
+    if (!touch && !ghost) {
+      document.body.style.overflow = bodyDefaultOverflow;
+      document.body.style.overscrollBehaviorY = bodyDefaultOverscrollBehaviorY;
+    }
+  }, [touch, ghost]); //////////////////////////
 
   /* Touch screens events */
   //////////////////////////
-
 
   var _onTouchStart = function _onTouchStart(e, itemIndex) {
     e.preventDefault();
@@ -311,6 +369,7 @@ function DraggableMasonryLayout(props) {
     var touchY = e.touches[0].clientY;
     setDrag(function (drag) {
       !drag && clearTimeout(longPress);
+      !drag && clearTimeout(press);
 
       if (drag) {
         var overElementId = document.elementFromPoint(touchX, touchY).id;
@@ -326,20 +385,22 @@ function DraggableMasonryLayout(props) {
     }); // setOverItemIndex(itemIndex);
   };
 
-  var onTouchEnd = function onTouchEnd(e) {
+  var _onTouchEnd = function _onTouchEnd(e) {
     setUILog("touch end");
-    setDragItemIndex(function (dragItemIndex) {
-      dragItemIndex !== undefined && clearTimeout(longPress); // Cancel drag event for touch scn
+    clearTimeout(press);
+    clearTimeout(longPress); // Cancel drag event for touch scn
 
-      return dragItemIndex;
-    });
     cleanupDrag();
     setTouch(false);
-  }; //////////////////
+  };
+
+  (0, _react.useEffect)(function () {
+    setBodyDefaultOverflow(document.body.style.overflow);
+    setBodyDefaultOverscrollBehaviorY(document.body.style.overscrollBehaviorY);
+  }, []); //////////////////
 
   /* Mouse events */
   //////////////////
-
 
   (0, _react.useEffect)(function () {
     document.addEventListener("mousemove", onMouseMove);
@@ -427,6 +488,11 @@ function DraggableMasonryLayout(props) {
 
     if (touch && !drag) {
       // For touch interface
+      press = setTimeout(function () {
+        // Temporary disable scroll and pull-down-to-refresh
+        document.body.style.overflow = "hidden";
+        document.body.style.overscrollBehaviorY = "contain";
+      }, 300);
       longPress = // Long press event
       touchFingers === 1 && setTimeout(function () {
         setDrag(true);
@@ -435,44 +501,109 @@ function DraggableMasonryLayout(props) {
   }, [touch, touchFingers, mouseDown, drag, mouseDownPos, mousePos]);
   (0, _react.useEffect)(function () {
     // Start dragging
-    if (drag && !ghost) {
-      var dragElementWrapper = document.getElementById("".concat(items[dragItemIndex].id, "-wrapper"));
-      setDragPoint({
-        x: (touch ? firstTouchPos.x : mouseDownPos.x) - dragElementWrapper.offsetLeft,
-        y: (touch ? firstTouchPos.y : mouseDownPos.y) - dragElementWrapper.offsetTop
-      });
+    if (drag && !ghost && !dragPoint) {
+      try {
+        var dragElementRect = document.getElementById("".concat(items[dragItemIndex].id, "-wrapper")).getBoundingClientRect();
+        setDragPoint({
+          x: (touch ? firstTouchPos.x : mouseDownPos.x) - dragElementRect.left,
+          y: (touch ? firstTouchPos.y : mouseDownPos.y) - dragElementRect.top
+        });
+      } catch (err) {
+        console.error(err);
+      }
     }
-  }, [drag, dragItemIndex, firstTouchPos, mouseDownPos, touch, items, ghost]);
+  }, [drag, dragItemIndex, firstTouchPos, mouseDownPos, touch, items, ghost]); ////////////
+
+  /* Ghost */
+  ///////////
+
   (0, _react.useEffect)(function () {
-    // Set ghost position to mouse move position
+    // Ghost positioning effect
     if (drag && dragPoint && (touchPos || mousePos)) {
-      !ghost && setGhost(_react["default"].cloneElement(items[dragItemIndex].element));
+      if (!ghost) {
+        // Create ghost
+        var sourceId = items[dragItemIndex].id;
+        var id = "".concat(sourceId, "-ghost");
+        var sourceElement = document.getElementById(sourceId);
+        var sourceClassList = sourceElement.classList;
+        sourceElement.classList.add("ghost", touch && "touch"); // Add classNames to source to animate styles
+        // Set Ghost element
+
+        var newClassNames = "ghost ".concat(touch && "touch");
+        var className = "".concat(sourceClassList, " ").concat(newClassNames);
+
+        var component = _react["default"].cloneElement(items[dragItemIndex].element, {
+          draggableItem: {
+            id: id,
+            className: className
+          }
+        }); // Clone source
+
+
+        setGhost(component);
+      }
+
+      !ghostSourceId && setGhostSourceId(items[dragItemIndex].id); // Set ghost position to mouse move position
+
       setGhostPos({
-        x: (touch ? touchPos.x : mousePos.x) - dragPoint.x - window.scrollX,
-        y: (touch ? touchPos.y : mousePos.y) - dragPoint.y - window.scrollY
+        x: (touch ? touchPos.x : mousePos.x) - dragPoint.x,
+        y: (touch ? touchPos.y : mousePos.y) - dragPoint.y
       });
+    } else if (!drag && ghost) {
+      try {
+        // Move ghost to the source position
+        var rect = document.getElementById("".concat(ghostSourceId, "-wrapper")).getBoundingClientRect();
+        var x = rect.left;
+        var y = rect.top;
+        setGhostPos({
+          x: x,
+          y: y
+        });
+      } catch (err) {
+        console.error(err);
+      }
+
+      ghostTimeout = setTimeout(function () {
+        // If onTransitionEnd event was not triggered
+        onGhostEndTransition();
+      }, ghostTransitionDuration + 100);
     }
-  }, [mousePos, touchPos, touch, drag, dragPoint, dragItemIndex, ghost, items]); ////////////////////
+  }, [mousePos, touchPos, touch, drag, dragPoint, dragItemIndex, ghost, items]);
+
+  var onGhostEndTransition = function onGhostEndTransition() {
+    // Turn-off ghost
+    clearTimeout(ghostTimeout);
+    setGhost(undefined);
+    setGhostPos(undefined);
+  };
+
+  (0, _react.useEffect)(function () {
+    // Clean source element. Transit to original styles
+    if (!ghost && ghostSourceId) {
+      document.getElementById(ghostSourceId).classList.remove("ghost", "touch");
+      setGhostSourceId(undefined);
+    }
+  }, [ghost]); ////////////////////
 
   /* Masonry Layout */
   ////////////////////
 
-  var _useState39 = (0, _react.useState)(false),
-      _useState40 = _slicedToArray(_useState39, 2),
-      layoutIsMount = _useState40[0],
-      setLayoutIsMount = _useState40[1];
+  var _useState45 = (0, _react.useState)(false),
+      _useState46 = _slicedToArray(_useState45, 2),
+      layoutIsMount = _useState46[0],
+      setLayoutIsMount = _useState46[1];
 
-  var _useState41 = (0, _react.useState)(0),
-      _useState42 = _slicedToArray(_useState41, 2),
-      columns = _useState42[0],
-      setColumns = _useState42[1];
+  var _useState47 = (0, _react.useState)(0),
+      _useState48 = _slicedToArray(_useState47, 2),
+      columns = _useState48[0],
+      setColumns = _useState48[1];
 
-  var _useState43 = (0, _react.useState)(false),
-      _useState44 = _slicedToArray(_useState43, 2),
-      transition = _useState44[0],
-      setTransition = _useState44[1];
+  var _useState49 = (0, _react.useState)(false),
+      _useState50 = _slicedToArray(_useState49, 2),
+      transition = _useState50[0],
+      setTransition = _useState50[1];
 
-  var _useState45 = (0, _react.useState)({
+  var _useState51 = (0, _react.useState)({
     elements: [],
     width: 0,
     height: 0,
@@ -492,30 +623,47 @@ function DraggableMasonryLayout(props) {
       }
     }
   }),
-      _useState46 = _slicedToArray(_useState45, 2),
-      layout = _useState46[0],
-      setLayout = _useState46[1];
+      _useState52 = _slicedToArray(_useState51, 2),
+      layout = _useState52[0],
+      setLayout = _useState52[1];
 
-  var _useState47 = (0, _react.useState)(0),
-      _useState48 = _slicedToArray(_useState47, 2),
-      onErrorCount = _useState48[0],
-      setOnErrorCount = _useState48[1];
+  var _useState53 = (0, _react.useState)(0),
+      _useState54 = _slicedToArray(_useState53, 2),
+      onErrorCount = _useState54[0],
+      setOnErrorCount = _useState54[1];
 
-  var _useState49 = (0, _react.useState)(0),
-      _useState50 = _slicedToArray(_useState49, 2),
-      onLoadCount = _useState50[0],
-      setOnLoadCount = _useState50[1];
+  var _useState55 = (0, _react.useState)(0),
+      _useState56 = _slicedToArray(_useState55, 2),
+      onLoadCount = _useState56[0],
+      setOnLoadCount = _useState56[1];
 
   var masonryLayout = (0, _react.useRef)(); // Top wrapper
 
   var endlineStartRef = (0, _react.useRef)(); // Endline start sensor
 
   var endlineEndRef = (0, _react.useRef)(); // Endline end sensor
+  ////////////
+  // Resize //
+  ////////////
+
+  var _useState57 = (0, _react.useState)(window.innerWidth),
+      _useState58 = _slicedToArray(_useState57, 2),
+      winWidth = _useState58[0],
+      setWinWidth = _useState58[1];
+
+  var _useState59 = (0, _react.useState)(false),
+      _useState60 = _slicedToArray(_useState59, 2),
+      isResized = _useState60[0],
+      setIsResized = _useState60[1];
+
+  var handleResize = function handleResize(evt) {
+    return setIsResized(true);
+  };
 
   (0, _react.useEffect)(function () {
     // Mount and unmount only
     // Add/remove event listeners
-    checkLayout();
+    // checkLayout();
     window.addEventListener("resize", handleResize);
     window.addEventListener("scroll", handleScroll);
     return function () {
@@ -523,12 +671,15 @@ function DraggableMasonryLayout(props) {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+  (0, _react.useEffect)(function () {
+    var widthIsResized = window.innerWidth !== winWidth;
 
-  var handleResize = function handleResize(evt) {
-    checkLayout(evt);
-  };
+    if (widthIsResized) {
+      props.onWidthResize();
+      setWinWidth(window.innerWidth);
+    } // Check layout
 
-  var checkLayout = function checkLayout(evt) {
+
     var wrapperWidth = masonryLayout.current.offsetWidth;
     var cardRefItem;
 
@@ -539,11 +690,12 @@ function DraggableMasonryLayout(props) {
       }
     }
 
-    var cardWrapperWidth = document.getElementById("".concat(cardRefItem.id, "-wrapper")).offsetWidth;
+    var cardWrapperWidth = items[0].width || document.getElementById("".concat(cardRefItem.id, "-wrapper")).offsetWidth;
     setColumns(Math.floor(wrapperWidth / cardWrapperWidth)); // turn on transition if window resizing
 
-    setTransition(evt !== undefined);
-  };
+    setTransition(isResized);
+    setIsResized(false);
+  }, [isResized, items]);
 
   var handleScroll = function handleScroll(e) {
     checkEndlineEnterEvent();
@@ -586,7 +738,7 @@ function DraggableMasonryLayout(props) {
         return true;
       }
     });
-  }, [items]);
+  }, [items, layout.elements.length]);
   (0, _react.useEffect)(function () {
     // set layout
     var elements = [];
@@ -604,11 +756,11 @@ function DraggableMasonryLayout(props) {
     itemsSortedByOrder.forEach(function (item, index) {
       // Calculate positions of each element
       var cardWrapperElement = document.getElementById("".concat(item.id, "-wrapper"));
-      var height = cardWrapperElement.offsetHeight;
-      cardWrapperWidth = cardWrapperElement.offsetWidth;
+      var height = item.height || cardWrapperElement.offsetHeight;
+      cardWrapperWidth = item.width || cardWrapperElement.offsetWidth;
       var cardElement = document.getElementById(item.id);
-      var cardWidth = cardElement.offsetWidth;
-      var cardHeight = cardElement.offsetHeight;
+      var cardWidth = item.width || cardElement.offsetWidth;
+      var cardHeight = item.height || cardElement.offsetHeight;
       var cardOffsetLeft = cardElement.offsetLeft;
       var cardOffsetTop = cardElement.offsetTop;
       var leastNum = Math.min.apply(Math, _toConsumableArray(endline.byColumns));
@@ -650,7 +802,7 @@ function DraggableMasonryLayout(props) {
       // height of the whole layout
       endline: endline
     });
-  }, [columns, onLoadCount, onErrorCount, items]);
+  }, [columns, onLoadCount, onErrorCount, items, layout.endline]);
 
   var errorHandler = function errorHandler(index) {
     setOnErrorCount(onErrorCount + 1);
@@ -677,9 +829,9 @@ function DraggableMasonryLayout(props) {
         userSelect: "none",
         top: "".concat(layout.elements[index] ? layout.elements[index].y : 0, "px"),
         left: "".concat(layout.elements[index] ? layout.elements[index].x : 0, "px"),
-        transition: "".concat(transition && layoutIsMount ? "top 0.4s, left 0.4s" : "none"),
+        transition: "".concat(ghostSourceId !== item.id && transition && layoutIsMount ? "top ".concat(transitionDuration, "ms ").concat(transitionTimingFunction, ", left ").concat(transitionDuration, "ms ").concat(transitionTimingFunction) : "none"),
         visibility: layout.elements[index] && layoutIsMount ? "visible" : "hidden",
-        opacity: ghostPos && dragItemIndex === items[index].index ? 0 : 1
+        opacity: ghost && ghostSourceId === items[index].id ? 0 : 1
       },
       onLoad: loadHandler,
       onError: errorHandler,
@@ -702,12 +854,18 @@ function DraggableMasonryLayout(props) {
       position: "relative",
       width: "".concat(layout.width, "px"),
       height: "".concat(layout.height, "px"),
-      margin: "0 auto 0 auto"
+      margin: "0 auto 0 auto",
+      // outline: "1px solid red",
+      transition: transition && layoutIsMount ? "width ".concat(transitionDuration, "ms ").concat(transitionTimingFunction) : "none"
     },
     className: "boundry-box"
-  }, renderItems, drag && ghostPos && _react["default"].createElement(Ghost, {
+  }, renderItems, ghost && _react["default"].createElement(_Ghost["default"], {
     x: ghostPos.x,
-    y: ghostPos.y
+    y: ghostPos.y,
+    drag: drag,
+    onGhostEndTransition: onGhostEndTransition,
+    ghostTransitionDuration: ghostTransitionDuration,
+    ghostTransitionTimingFunction: ghostTransitionTimingFunction
   }, ghost), layout.endline.start.y !== undefined && _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("div", {
     id: "MasonryLayoutEndlineStart",
     ref: endlineStartRef,
@@ -730,7 +888,18 @@ function DraggableMasonryLayout(props) {
 DraggableMasonryLayout.propTypes = {
   reverse: _propTypes["default"].bool,
   onEndlineEnter: _propTypes["default"].func,
-  onRearrange: _propTypes["default"].func
+  onRearrange: _propTypes["default"].func,
+  onWidthResize: _propTypes["default"].func,
+  transitionDuration: _propTypes["default"].number,
+  transitionTimingFunction: _propTypes["default"].string,
+  ghostTransitionDuration: _propTypes["default"].number,
+  ghostTransitionTimingFunction: _propTypes["default"].string
+};
+DraggableMasonryLayout.defaultProps = {
+  transitionDuration: 600,
+  transitionTimingFunction: "ease",
+  ghostTransitionDuration: 200,
+  ghostTransitionTimingFunction: "ease"
 };
 var _default = DraggableMasonryLayout;
 exports["default"] = _default;
