@@ -1,6 +1,10 @@
 # RUDL
 React Universal DnD Layout
 
+## Overview
+
+The main goal of RUDL is to give you 
+
 ## Install
 
 ```shell
