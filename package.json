@@ -1,7 +1,7 @@
 {
-  "name": "react-universal-dnd-layout",
-  "version": "0.1.0-beta.4",
-  "description": "Drag and drop for lists, tiles and masonry layouts",
+  "name": "rudl",
+  "version": "0.1.0-alpha.0",
+  "description": "React Universal DnD Layout",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/guandjoy/react-universal-dnd-layout.git"
+    "url": "git+https://github.com/guandjoy/rudl.git"
   },
   "keywords": [
     "react",
@@ -38,7 +38,7 @@
   },
   "dependencies": {},
   "bugs": {
-    "url": "https://github.com/guandjoy/react-universal-dnd-layout/issues"
+    "url": "https://github.com/guandjoy/rudl/issues"
   },
-  "homepage": "https://github.com/guandjoy/react-universal-dnd-layout#readme"
+  "homepage": "https://github.com/guandjoy/rudl#readme"
 }
