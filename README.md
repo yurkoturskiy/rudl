@@ -1,9 +1,13 @@
 # RUDL
 React Universal DnD Layout
 
+## Examples
+
+First demo: https://rudl.netlify.com/
+
 ## Overview
 
-The main goal of RUDL is to give you 
+The main goal of RUDL is to provide seamless transition between different layouts.
 
 ## Install
 
