@@ -1,3 +1,4 @@
+![image](/img/cover.png)
 # RUDL
 React Universal DnD Layout
 
