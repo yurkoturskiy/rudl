@@ -1,4 +1,6 @@
-![image](/img/cover.png)
+<p align="center">
+  <a href="https://rudl.netlify.com/"><img src="/img/cover.png" /></a>
+</p>
 # RUDL
 React Universal DnD Layout
 
