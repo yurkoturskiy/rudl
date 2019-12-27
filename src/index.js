@@ -268,10 +268,7 @@ function DraggableMasonryLayout(props) {
     setDragItemIndex(itemIndex);
   };
 
-  const onMouseEnterItem = (e, itemIndex) => {
-    setOverItemIndex(itemIndex);
-    setMousePos({ x: e.clientX, y: e.clientY });
-  };
+  const onMouseEnterItem = (e, itemIndex) => setOverItemIndex(itemIndex);
 
   const onMouseMove = e => {
     e.preventDefault();
