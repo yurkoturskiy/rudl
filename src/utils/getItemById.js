@@ -1,4 +1,4 @@
-export default function getItemById({ id, items }) {
+export default function getItemById({ id, items, props }) {
   // Return object with required id from items array
   let indexOfItem;
   for (var i = 0, len = props.children.length; i < len; i++) {
