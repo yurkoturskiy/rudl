@@ -518,28 +518,25 @@ function DraggableMasonryLayout(props) {
 
   useEffect(() => {
     // set layout
-    var elements = [];
-    var endline = layout.endline;
-    var cardWrapperWidth;
-    endline.byColumns = [];
-    for (let i = 0; i < columns; i++) {
-      endline.byColumns[i] = 0;
-    }
-    let itemsSortedByOrder = items.concat().sort((a, b) => a.order - b.order);
+    let elements = [];
+    let endline = layout.endline;
+    let cardWrapperWidth;
+    endline.byColumns = Array(columns).fill(0);
+    const itemsSortedByOrder = items.concat().sort((a, b) => a.order - b.order);
     itemsSortedByOrder.forEach((item, index) => {
       // Calculate positions of each element
-      let cardWrapperElement = document.getElementById(`${item.id}-wrapper`);
-      let height = item.height || cardWrapperElement.offsetHeight;
+      const cardWrapperElement = document.getElementById(`${item.id}-wrapper`);
+      const height = item.height || cardWrapperElement.offsetHeight;
       cardWrapperWidth = item.width || cardWrapperElement.offsetWidth;
-      let cardElement = document.getElementById(item.id);
-      let cardWidth = item.width || cardElement.offsetWidth;
-      let cardHeight = item.height || cardElement.offsetHeight;
-      let cardOffsetLeft = cardElement.offsetLeft;
-      let cardOffsetTop = cardElement.offsetTop;
-      let leastNum = Math.min(...endline.byColumns);
-      let leastNumIndex = endline.byColumns.indexOf(leastNum);
-      let maxNum = Math.max(...endline.byColumns);
-      let maxNumIndex = endline.byColumns.indexOf(maxNum);
+      const cardElement = document.getElementById(item.id);
+      const cardWidth = item.width || cardElement.offsetWidth;
+      const cardHeight = item.height || cardElement.offsetHeight;
+      const cardOffsetLeft = cardElement.offsetLeft;
+      const cardOffsetTop = cardElement.offsetTop;
+      const leastNum = Math.min(...endline.byColumns);
+      const leastNumIndex = endline.byColumns.indexOf(leastNum);
+      const maxNum = Math.max(...endline.byColumns);
+      const maxNumIndex = endline.byColumns.indexOf(maxNum);
       let x, y;
       if (item.separator) {
         x = 0;
@@ -581,17 +578,15 @@ function DraggableMasonryLayout(props) {
     console.log("can't load: ", index);
   };
 
-  const loadHandler = index => {
-    setOnLoadCount(onLoadCount + 1);
-  };
+  const loadHandler = index => setOnLoadCount(onLoadCount + 1);
 
   const onClickEvent = e => {
     // console.log("click");
   };
 
-  var renderItems = items.map((item, index) => {
+  const renderItems = items.map((item, index) => {
     // Render eash child
-    let newComponent = (
+    const newComponent = (
       <div
         className="element-bounding"
         id={`${item.id}-wrapper`}
