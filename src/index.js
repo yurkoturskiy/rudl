@@ -87,9 +87,37 @@ function DraggableMasonryLayout(props) {
   /* Events' methods */
   /////////////////////
 
+  const reorderReducer = (newOrder, item) => {
+    let order = item.order; // Item is out of range. Keep same order
+
+    // Override for items need to be changed
+    if (items[dragItemIndex].order < items[overItemIndex].order) {
+      // Drag toward the end
+      if (
+        item.order > items[dragItemIndex].order &&
+        item.order <= items[overItemIndex].order
+      )
+        // Inbetween notes. Replace on one to the start
+        order = item.order - 1;
+      else if (item.order === items[dragItemIndex].order)
+        // Assign new order to the draggable
+        order = items[overItemIndex].order;
+    } else if (items[dragItemIndex].order > items[overItemIndex].order) {
+      // Drag toward the start
+      if (
+        item.order < items[dragItemIndex].order &&
+        item.order >= items[overItemIndex].order
+      )
+        // Inbetween notes. Replace on one to the end
+        order = item.order + 1;
+      else if (item.order === items[dragItemIndex].order)
+        // Assign new order to the draggable
+        order = items[overItemIndex].order;
+    }
+    return newOrder.concat(order);
+  };
+
   useEffect(() => {
-    var newItems;
-    var newOrder = [];
     setItems(items => {
       if (
         dragItemIndex !== undefined &&
@@ -97,39 +125,9 @@ function DraggableMasonryLayout(props) {
         overItemIndex !== dragItemIndex &&
         !isRearranges
       ) {
-        // console.log("rearrange");
-        // console.log("drag item order", items[dragItemIndex].order);
-        // console.log("drag item new order", items[overItemIndex].order);
         setDragItemNewOrder(items[overItemIndex].order);
-        items.forEach((item, index) => {
-          newOrder[index] = item.order; // Item is out of range. Keep same order
-          // Override for items need to be changed
-          if (items[dragItemIndex].order < items[overItemIndex].order) {
-            // Drag toward the end
-            if (
-              item.order > items[dragItemIndex].order &&
-              item.order <= items[overItemIndex].order
-            )
-              // Inbetween notes. Replace on one to the start
-              newOrder[index] = item.order - 1;
-            if (item.order === items[dragItemIndex].order)
-              // Assign new order to the draggable
-              newOrder[index] = items[overItemIndex].order;
-          }
-          if (items[dragItemIndex].order > items[overItemIndex].order) {
-            // Drag toward the start
-            if (
-              item.order < items[dragItemIndex].order &&
-              item.order >= items[overItemIndex].order
-            )
-              // Inbetween notes. Replace on one to the end
-              newOrder[index] = item.order + 1;
-            if (item.order === items[dragItemIndex].order)
-              // Assign new order to the draggable
-              newOrder[index] = items[overItemIndex].order;
-          }
-        });
-        newItems = items.map((item, index) => {
+        const newOrder = items.reduce(reorderReducer, []);
+        const newItems = items.map((item, index) => {
           item.order = newOrder[index];
           return item;
         });
