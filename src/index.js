@@ -325,7 +325,7 @@ function DraggableMasonryLayout(props) {
     // Start dragging
     if (drag && !ghost && !dragPoint) {
       try {
-        let dragElementRect = document
+        const dragElementRect = document
           .getElementById(`${items[dragItemIndex].id}-wrapper`)
           .getBoundingClientRect();
         setDragPoint({
@@ -346,15 +346,15 @@ function DraggableMasonryLayout(props) {
     if (drag && dragPoint && (touchPos || mousePos)) {
       if (!ghost) {
         // Create ghost
-        let sourceId = items[dragItemIndex].id;
-        let id = `${sourceId}-ghost`;
+        const sourceId = items[dragItemIndex].id;
+        const id = `${sourceId}-ghost`;
         let sourceElement = document.getElementById(sourceId);
-        let sourceClassList = sourceElement.classList;
+        const sourceClassList = sourceElement.classList;
         sourceElement.classList.add("ghost", touch && "touch"); // Add classNames to source to animate styles
         // Set Ghost element
-        let newClassNames = `ghost ${touch && "touch"}`;
-        let className = `${sourceClassList} ${newClassNames}`;
-        let component = React.cloneElement(items[dragItemIndex].element, {
+        const newClassNames = `ghost ${touch && "touch"}`;
+        const className = `${sourceClassList} ${newClassNames}`;
+        const component = React.cloneElement(items[dragItemIndex].element, {
           draggableItem: { id, className }
         }); // Clone source
         setGhost(component);
@@ -368,11 +368,11 @@ function DraggableMasonryLayout(props) {
     } else if (!drag && ghost) {
       try {
         // Move ghost to the source position
-        let rect = document
+        const rect = document
           .getElementById(`${ghostSourceId}-wrapper`)
           .getBoundingClientRect();
-        let x = rect.left;
-        let y = rect.top;
+        const x = rect.left;
+        const y = rect.top;
         setGhostPos({ x, y });
       } catch (err) {
         console.error(err);
