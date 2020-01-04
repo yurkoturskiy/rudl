@@ -447,19 +447,12 @@ function DraggableMasonryLayout(props) {
     }
     // Check layout
     const wrapperWidth = masonryLayout.current.offsetWidth;
-    var cardRefItem;
-    for (let i = 0; i < items.length; i++) {
-      if (!items[i].separator) {
-        cardRefItem = items[i];
-        break;
-      }
-    }
-
-    let cardWrapperWidth =
+    const cardRefItem = items.find(item => !item.separator);
+    const cardWrapperWidth =
       items[0].width ||
       document.getElementById(`${cardRefItem.id}-wrapper`).offsetWidth;
     setColumns(Math.floor(wrapperWidth / cardWrapperWidth));
-    // turn on transition if window resizing
+    // Turn on transition if window resizing
     setTransition(isResized);
     setIsResized(false);
   }, [isResized, items]);
