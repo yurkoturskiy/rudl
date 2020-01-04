@@ -197,8 +197,12 @@ function DraggableMasonryLayout(props) {
       !drag && clearTimeout(longPress);
       !drag && clearTimeout(press);
       if (drag) {
-        let overElementId = document.elementFromPoint(touchX, touchY).id;
-        let overElementItem = getItemById({ id: overElementId, items, props });
+        const overElementId = document.elementFromPoint(touchX, touchY).id;
+        const overElementItem = getItemById({
+          id: overElementId,
+          items,
+          props
+        });
         setOverItemIndex(overElementItem && overElementItem.index);
       }
       return drag;
