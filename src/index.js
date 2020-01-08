@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState, useReducer } from "react";
 import PropTypes from "prop-types";
 import Ghost from "./Ghost";
-// Utils
-import getItemById from "./utils/getItemById";
 
 //////////////////////////////
 /* Masonry layout component */
@@ -245,11 +243,7 @@ function DraggableMasonryLayout(props) {
       !drag && clearTimeout(press);
       if (drag) {
         const overElementId = document.elementFromPoint(touchX, touchY).id;
-        const overElementItem = getItemById({
-          id: overElementId,
-          items,
-          props
-        });
+        const overElementItem = items.find(item => item.id === overElementId);
         setOverItemIndex(overElementItem && overElementItem.index);
       }
       return drag;
