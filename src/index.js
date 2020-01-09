@@ -1,6 +1,10 @@
-import React, { useEffect, useRef, useState, useReducer } from "react";
+import React, { useEffect, useRef, useState, useReducer, useMemo } from "react";
 import PropTypes from "prop-types";
 import Ghost from "./Ghost";
+// Hooks
+
+// Event handlers
+import { mouseMoveHandler } from "./utils/eventHandlers";
 
 //////////////////////////////
 /* Masonry layout component */
@@ -127,6 +131,17 @@ function DraggableMasonryLayout(props) {
     bodyDefaultOverscrollBehaviorY,
     setBodyDefaultOverscrollBehaviorY
   ] = useState();
+
+  // Track mouse position only if dragItemIndex is defined
+  const onMouseMove = useMemo(() => mouseMoveHandler(setMousePos), [
+    setMousePos
+  ]);
+  useEffect(() => {
+    dragItemIndex && document.addEventListener("mousemove", onMouseMove);
+    return () => {
+      dragItemIndex && document.removeEventListener("mousemove", onMouseMove);
+    };
+  }, [dragItemIndex, onMouseMove]);
 
   /////////////////////
   /* Events' methods */
@@ -270,10 +285,8 @@ function DraggableMasonryLayout(props) {
   //////////////////
 
   useEffect(() => {
-    document.addEventListener("mousemove", onMouseMove);
     document.addEventListener("mouseup", onMouseUp);
     return () => {
-      document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("mouseup", onMouseUp);
     };
   }, []);
@@ -312,17 +325,6 @@ function DraggableMasonryLayout(props) {
   };
 
   const onMouseEnterItem = (e, itemIndex) => setOverItemIndex(itemIndex);
-
-  const onMouseMove = e => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragItemIndex(dragItemIndex => {
-      setMousePos(mousePos =>
-        dragItemIndex !== undefined ? { x: e.clientX, y: e.clientY } : mousePos
-      );
-      return dragItemIndex;
-    });
-  };
 
   const onDragEnd = () => {
     // Cleanup after dragging
