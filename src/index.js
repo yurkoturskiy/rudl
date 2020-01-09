@@ -10,44 +10,7 @@ import { mouseMoveHandler } from "./utils/eventHandlers";
 /* Masonry layout component */
 //////////////////////////////
 var longPress, press, ghostTimeout;
-const generateItemss = children => () =>
-  React.Children.map(children, (child, index) => {
-    if (child.props.separator) {
-      return {
-        index: index,
-        id: child.key,
-        order: child.props.order,
-        separator: child.props.separator,
-        element: child
-      };
-    }
-    return {
-      index: index,
-      id: child.key,
-      order: child.props.order,
-      separator: child.props.separator,
-      width: child.props.width,
-      height: child.props.height,
-      element: React.cloneElement(child, {
-        ...child.props,
-        draggableItem: {
-          onMouseDown: e => onMouseDown(e, index),
-          onMouseEnter: e => onMouseEnterItem(e, index),
-          onDragEnd: e => onDragEnd(e, index),
-          onTouchStart: e => onTouchStart(e, index),
-          onTouchMove: e => onTouchMove(e, index),
-          onTouchEnd: e => onTouchEnd(),
-          onClick: e => onClickEvent()
-        }
-      })
-    };
-  });
 // General
-const itemssReducer = (state, action) => {
-  console.log("item reducer", action, state);
-  if (action.type === "update") return generateItemss(action.payload)();
-};
-
 function DraggableMasonryLayout(props) {
   const {
     transitionTimingFunction,
@@ -55,16 +18,6 @@ function DraggableMasonryLayout(props) {
     ghostTransitionDuration,
     ghostTransitionTimingFunction
   } = props;
-
-  const [itemss, updateItems] = useReducer(
-    itemssReducer,
-    [],
-    generateItemss(props.children)
-  );
-  useEffect(() => {
-    updateItems({ type: "update", payload: props.children });
-    console.log("itemss", itemss);
-  }, [props.children]);
 
   const generateItems = () =>
     React.Children.map(props.children, (child, index) => {
