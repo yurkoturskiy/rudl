@@ -244,16 +244,10 @@ function DraggableMasonryLayout(props) {
   };
 
   const onMouseDown = (e, itemIndex) => {
-    let freshTouch;
-    setTouch(touch => {
-      freshTouch = touch.isActive;
-      return touch;
-    });
-    freshTouch && e.preventDefault();
+    e.preventDefault();
     setMousePos({ x: e.clientX, y: e.clientY });
     setMouseDown(true);
     setMouseDownPos({ x: e.clientX, y: e.clientY });
-    // setPreventClick(false);
     setDragItemIndex(itemIndex);
   };
 
