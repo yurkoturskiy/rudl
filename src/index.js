@@ -6,6 +6,7 @@ import Ghost from "./Ghost";
 // Event handlers
 import {
   mouseMoveHandler,
+  onMouseDown,
   onTouchStart,
   onTouchMove
 } from "./utils/eventHandlers";
@@ -44,11 +45,11 @@ function DraggableMasonryLayout(props) {
         element: React.cloneElement(child, {
           ...child.props,
           draggableItem: {
-            onMouseDown: e => onMouseDown(e, index),
+            onMouseDown: onMouseDown(setMouse)(index),
             onMouseEnter: e => onMouseEnterItem(e, index),
             onDragEnd: e => onDragEnd(e, index),
             onTouchStart: onTouchStart(setTouch)(index),
-            onTouchMove: onTouchMove(setTouchPos),
+            onTouchMove: onTouchMove(setTouch),
             onTouchEnd: e => onTouchEnd(),
             onClick: e => onClickEvent()
           }
@@ -65,12 +66,9 @@ function DraggableMasonryLayout(props) {
   const [isRearranges, setIsRearranges] = useState(false);
   // Touch events
   const [touch, setTouch] = useState(false);
-  const [touchPos, setTouchPos] = useState();
   const [UILog, setUILog] = useState("");
   // Mouse
-  const [mousePos, setMousePos] = useState();
-  const [mouseDown, setMouseDown] = useState(false);
-  const [mouseDownPos, setMouseDownPos] = useState();
+  const [mouse, setMouse] = useState();
   // Drag events
   const [drag, setDrag] = useState(false);
   const [dragItemIndex, setDragItemIndex] = useState();
@@ -88,15 +86,17 @@ function DraggableMasonryLayout(props) {
   ] = useState();
 
   // Track mouse position only if dragItemIndex is defined
-  const onMouseMove = useMemo(() => mouseMoveHandler(setMousePos), [
-    setMousePos
-  ]);
+  const onMouseMove = useMemo(() => mouseMoveHandler(setMouse), [setMouse]);
   useEffect(() => {
-    dragItemIndex && document.addEventListener("mousemove", onMouseMove);
+    mouse &&
+      mouse.isDown &&
+      document.addEventListener("mousemove", onMouseMove);
     return () => {
-      dragItemIndex && document.removeEventListener("mousemove", onMouseMove);
+      mouse &&
+        mouse.isDown &&
+        document.removeEventListener("mousemove", onMouseMove);
     };
-  }, [dragItemIndex, onMouseMove]);
+  }, [mouse, onMouseMove]);
 
   /////////////////////
   /* Events' methods */
@@ -159,11 +159,9 @@ function DraggableMasonryLayout(props) {
 
   const cleanupDrag = () => {
     // Mouse
-    setMouseDown(false);
-    setMousePos(null);
+    setMouse(null);
     // Touch
     setTouch(false);
-    setTouchPos(null);
     // Drag
     setDrag(false);
     setDragPoint(null);
@@ -178,7 +176,7 @@ function DraggableMasonryLayout(props) {
       document.body.style.overflow = bodyDefaultOverflow;
       document.body.style.overscrollBehaviorY = bodyDefaultOverscrollBehaviorY;
     }
-  }, [touch, ghost]);
+  }, [touch, ghost, bodyDefaultOverflow, bodyDefaultOverscrollBehaviorY]);
 
   //////////////////////////
   /* Touch screens events */
@@ -187,18 +185,21 @@ function DraggableMasonryLayout(props) {
   // Trigger on touch move
   const overElementId = useMemo(
     () =>
-      touchPos && drag && document.elementFromPoint(touchPos.x, touchPos.y).id,
-    [touchPos, drag]
+      touch &&
+      touch.pos &&
+      drag &&
+      document.elementFromPoint(touch.pos.x, touch.pos.y).id,
+    [touch, drag]
   );
   useEffect(() => {
     if (drag && overElementId) {
       const overElementItem = items.find(item => item.id === overElementId);
       setOverItemIndex(overElementItem && overElementItem.index);
     } else {
-      touchPos && clearTimeout(longPress);
-      touchPos && clearTimeout(press);
+      touch && touch.pos && clearTimeout(longPress);
+      touch && touch.pos && clearTimeout(press);
     }
-  }, [drag, items, overElementId, touchPos]);
+  }, [drag, items, overElementId, touch]);
 
   const onTouchEnd = e => {
     setUILog("touch end");
@@ -243,14 +244,6 @@ function DraggableMasonryLayout(props) {
     cleanupDrag();
   };
 
-  const onMouseDown = (e, itemIndex) => {
-    e.preventDefault();
-    setMousePos({ x: e.clientX, y: e.clientY });
-    setMouseDown(true);
-    setMouseDownPos({ x: e.clientX, y: e.clientY });
-    setDragItemIndex(itemIndex);
-  };
-
   const onMouseEnterItem = (e, itemIndex) => setOverItemIndex(itemIndex);
 
   const onDragEnd = () => {
@@ -265,15 +258,16 @@ function DraggableMasonryLayout(props) {
 
   useEffect(() => {
     // Set drag
-    if (mouseDown && !drag) {
+    if (mouse && mouse.isDown && mouse.pos && !drag) {
       // For mouse interface
       if (
-        Math.abs(mousePos.x - mouseDownPos.x) >= 3 ||
-        Math.abs(mousePos.y - mouseDownPos.y) >= 3
+        Math.abs(mouse.pos.x - mouse.initialPos.x) >= 3 ||
+        Math.abs(mouse.pos.y - mouse.initialPos.y) >= 3
       ) {
         setDrag(true);
         setPreventClick(true);
-        setDragItemPrevOrder(items[dragItemIndex].order);
+        setDragItemPrevOrder(items[mouse.itemIndex].order);
+        setDragItemIndex(mouse.itemIndex);
       }
     }
     if (touch && !drag) {
@@ -286,38 +280,39 @@ function DraggableMasonryLayout(props) {
       longPress = // Long press event
         touch.numOfFingers === 1 &&
         setTimeout(() => {
-          setTouchPos({ ...touch.initialPos });
           setDragItemIndex(touch.itemIndex);
           setDrag(true);
         }, 500);
     }
-  }, [touch, mouseDown, drag, mouseDownPos, mousePos]);
+  }, [touch, mouse, drag, items]);
 
   useEffect(() => {
     // Start dragging
-    if (drag && !ghost && !dragPoint) {
+    if (drag && (touch || mouse) && !ghost && !dragPoint) {
       try {
         const dragElementRect = document
           .getElementById(`${items[dragItemIndex].id}-wrapper`)
           .getBoundingClientRect();
         setDragPoint({
           x:
-            (touch ? touch.initialPos.x : mouseDownPos.x) -
+            (touch ? touch.initialPos.x : mouse.initialPos.x) -
             dragElementRect.left,
-          y: (touch ? touch.initialPos.y : mouseDownPos.y) - dragElementRect.top
+          y:
+            (touch ? touch.initialPos.y : mouse.initialPos.y) -
+            dragElementRect.top
         });
       } catch (err) {
         console.error(err);
       }
     }
-  }, [drag, dragItemIndex, mouseDownPos, touch, items, ghost]);
+  }, [drag, dragItemIndex, touch, items, ghost, mouse, dragPoint]);
 
   ////////////
   /* Ghost */
   ///////////
   useEffect(() => {
     // Ghost positioning effect
-    if (drag && dragPoint && (touchPos || mousePos)) {
+    if (drag && dragPoint && (touch || mouse)) {
       if (!ghost) {
         // Create ghost
         const sourceId = items[dragItemIndex].id;
@@ -336,8 +331,8 @@ function DraggableMasonryLayout(props) {
       !ghostSourceId && setGhostSourceId(items[dragItemIndex].id);
       // Set ghost position to mouse move position
       setGhostPos({
-        x: (touch ? touchPos.x : mousePos.x) - dragPoint.x,
-        y: (touch ? touchPos.y : mousePos.y) - dragPoint.y
+        x: (touch ? touch.pos.x : mouse.pos.x) - dragPoint.x,
+        y: (touch ? touch.pos.y : mouse.pos.y) - dragPoint.y
       });
     } else if (!drag && ghost) {
       try {
@@ -356,7 +351,17 @@ function DraggableMasonryLayout(props) {
         onGhostEndTransition();
       }, ghostTransitionDuration + 100);
     }
-  }, [mousePos, touchPos, touch, drag, dragPoint, dragItemIndex, ghost, items]);
+  }, [
+    mouse,
+    touch,
+    drag,
+    dragPoint,
+    dragItemIndex,
+    ghost,
+    items,
+    ghostSourceId,
+    ghostTransitionDuration
+  ]);
 
   const onGhostEndTransition = () => {
     // Turn-off ghost
@@ -372,7 +377,7 @@ function DraggableMasonryLayout(props) {
       document.getElementById(ghostSourceId).classList.remove("ghost", "touch");
       setGhostSourceId(null);
     }
-  }, [ghost]);
+  }, [ghost, ghostSourceId]);
 
   ////////////////////
   /* Masonry Layout */
@@ -655,6 +660,8 @@ function DraggableMasonryLayout(props) {
 }
 
 DraggableMasonryLayout.propTypes = {
+  header: PropTypes.element,
+  children: PropTypes.element,
   reverse: PropTypes.bool,
   onEndlineEnter: PropTypes.func,
   onRearrange: PropTypes.func,
