@@ -4,7 +4,7 @@ import Ghost from "./Ghost";
 // Hooks
 
 // Event handlers
-import { mouseMoveHandler } from "./utils/eventHandlers";
+import { mouseMoveHandler, onTouchMove } from "./utils/eventHandlers";
 
 //////////////////////////////
 /* Masonry layout component */
@@ -44,7 +44,7 @@ function DraggableMasonryLayout(props) {
             onMouseEnter: e => onMouseEnterItem(e, index),
             onDragEnd: e => onDragEnd(e, index),
             onTouchStart: e => onTouchStart(e, index),
-            onTouchMove: e => onTouchMove(e, index),
+            onTouchMove: onTouchMove(setTouchPos),
             onTouchEnd: e => onTouchEnd(),
             onClick: e => onClickEvent()
           }
@@ -133,8 +133,8 @@ function DraggableMasonryLayout(props) {
 
     setItems(items => {
       if (
-        dragItemIndex !== undefined &&
-        overItemIndex !== undefined &&
+        dragItemIndex &&
+        overItemIndex &&
         overItemIndex !== dragItemIndex &&
         !isRearranges
       ) {
@@ -201,24 +201,21 @@ function DraggableMasonryLayout(props) {
     setDragItemIndex(itemIndex);
   };
 
-  const onTouchMove = (e, itemIndex) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const touchX = e.touches[0].clientX;
-    const touchY = e.touches[0].clientY;
-    setDrag(drag => {
-      !drag && clearTimeout(longPress);
-      !drag && clearTimeout(press);
-      if (drag) {
-        const overElementId = document.elementFromPoint(touchX, touchY).id;
-        const overElementItem = items.find(item => item.id === overElementId);
-        setOverItemIndex(overElementItem && overElementItem.index);
-      }
-      return drag;
-    });
-    setTouchPos({ x: e.touches[0].clientX, y: e.touches[0].clientY });
-    // setOverItemIndex(itemIndex);
-  };
+  // Trigger on touch move
+  const overElementId = useMemo(
+    () =>
+      touchPos && drag && document.elementFromPoint(touchPos.x, touchPos.y).id,
+    [touchPos, drag]
+  );
+  useEffect(() => {
+    if (drag && overElementId) {
+      const overElementItem = items.find(item => item.id === overElementId);
+      setOverItemIndex(overElementItem && overElementItem.index);
+    } else {
+      touchPos && clearTimeout(longPress);
+      touchPos && clearTimeout(press);
+    }
+  }, [drag, items, overElementId, touchPos]);
 
   const onTouchEnd = e => {
     setUILog("touch end");
