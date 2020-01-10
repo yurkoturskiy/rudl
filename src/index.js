@@ -253,7 +253,7 @@ function DraggableMasonryLayout(props) {
     setMousePos({ x: e.clientX, y: e.clientY });
     setMouseDown(true);
     setMouseDownPos({ x: e.clientX, y: e.clientY });
-    setPreventClick(false);
+    // setPreventClick(false);
     setDragItemIndex(itemIndex);
   };
 
@@ -369,6 +369,7 @@ function DraggableMasonryLayout(props) {
     clearTimeout(ghostTimeout);
     setGhost(null);
     setGhostPos(null);
+    setPreventClick(false);
   };
 
   useEffect(() => {
