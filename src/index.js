@@ -7,7 +7,7 @@ import React, {
   useCallback
 } from "react";
 import PropTypes from "prop-types";
-import Ghost from "./Ghost";
+import Ghost from "./components/Ghost";
 // Hooks
 import useItems from "./useItems/index";
 // Event handlers
