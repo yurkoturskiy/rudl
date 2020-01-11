@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-function Header({ width, children }) {
+function Header({ width, component }) {
   return (
     <div
       style={{
@@ -10,13 +10,13 @@ function Header({ width, children }) {
         margin: "0 auto 0 auto"
       }}
     >
-      {children}
+      {component}
     </div>
   );
 }
 
 Header.propTypes = {
-  children: PropTypes.element,
+  component: PropTypes.element,
   width: PropTypes.number
 };
 
