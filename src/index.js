@@ -53,8 +53,7 @@ function DraggableMasonryLayout(props) {
             onDragEnd: onDragEnd(cleanupDrag),
             onTouchStart: onTouchStart(setTouch)(index),
             onTouchMove: onTouchMove(setTouch),
-            onTouchEnd: onTouchEnd(cleanupDrag),
-            onClick: e => onClickEvent()
+            onTouchEnd: onTouchEnd(cleanupDrag)
           }
         })
       };
@@ -543,10 +542,6 @@ function DraggableMasonryLayout(props) {
   };
 
   const loadHandler = index => setOnLoadCount(onLoadCount + 1);
-
-  const onClickEvent = e => {
-    // console.log("click");
-  };
 
   const renderItems = items.map((item, index) => {
     // Render eash child
