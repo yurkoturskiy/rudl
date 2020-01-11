@@ -5,10 +5,10 @@ const Ghost = ({
   x,
   y,
   drag,
+  component,
   ghostTransitionDuration,
   ghostTransitionTimingFunction,
-  onGhostEndTransition,
-  children
+  onGhostEndTransition
 }) => (
   <>
     {children && (
@@ -25,7 +25,7 @@ const Ghost = ({
         }}
         onTransitionEnd={() => onGhostEndTransition()}
       >
-        {children}
+        {component}
       </div>
     )}
   </>
@@ -38,7 +38,7 @@ Ghost.propTypes = {
   ghostTransitionDuration: PropTypes.number,
   ghostTransitionTimingFunction: PropTypes.string,
   onGhostEndTransition: PropTypes.func,
-  children: PropTypes.element
+  component: PropTypes.element
 };
 
 export default Ghost;
