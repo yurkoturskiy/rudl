@@ -20,6 +20,10 @@ export const onMouseDown = setMouse => itemIndex => e => {
 export const onMouseEnter = setOverItemIndex => itemIndex => e =>
   setOverItemIndex(itemIndex);
 
+export const onDragEnd = cleanupDrag => e =>
+  // Cleanup after dragging
+  cleanupDrag();
+
 export const onTouchStart = setTouch => itemIndex => e => {
   e.preventDefault();
   e.stopPropagation();

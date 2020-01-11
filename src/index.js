@@ -9,7 +9,8 @@ import {
   onMouseDown,
   onMouseEnter,
   onTouchStart,
-  onTouchMove
+  onTouchMove,
+  onDragEnd
 } from "./utils/eventHandlers";
 
 //////////////////////////////
@@ -48,7 +49,7 @@ function DraggableMasonryLayout(props) {
           draggableItem: {
             onMouseDown: onMouseDown(setMouse)(index),
             onMouseEnter: onMouseEnter(setOverItemIndex)(index),
-            onDragEnd: e => onDragEnd(e, index),
+            onDragEnd: onDragEnd(cleanupDrag),
             onTouchStart: onTouchStart(setTouch)(index),
             onTouchMove: onTouchMove(setTouch),
             onTouchEnd: e => onTouchEnd(),
@@ -242,11 +243,6 @@ function DraggableMasonryLayout(props) {
   }, [dragItemNewOrder, dragItemIndex, items, dragItemPrevOrder, props, drag]);
 
   const onMouseUp = e => {
-    cleanupDrag();
-  };
-
-  const onDragEnd = () => {
-    // Cleanup after dragging
     cleanupDrag();
   };
 
