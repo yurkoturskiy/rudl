@@ -1,8 +1,15 @@
-import React, { useEffect, useRef, useState, useReducer, useMemo } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useReducer,
+  useMemo,
+  useCallback
+} from "react";
 import PropTypes from "prop-types";
 import Ghost from "./Ghost";
 // Hooks
-
+import useItems from "./useItems/index";
 // Event handlers
 import {
   mouseMoveHandler,
@@ -24,44 +31,27 @@ function DraggableMasonryLayout(props) {
     transitionTimingFunction,
     transitionDuration,
     ghostTransitionDuration,
-    ghostTransitionTimingFunction
+    ghostTransitionTimingFunction,
+    children
   } = props;
 
-  const generateItems = () =>
-    React.Children.map(props.children, (child, index) => {
-      if (child.props.separator) {
-        return {
-          index: index,
-          id: child.key,
-          order: child.props.order,
-          separator: child.props.separator,
-          element: child
-        };
-      }
-      return {
-        index: index,
-        id: child.key,
-        order: child.props.order,
-        separator: child.props.separator,
-        width: child.props.width,
-        height: child.props.height,
-        element: React.cloneElement(child, {
-          ...child.props,
-          draggableItem: {
-            onMouseDown: onMouseDown(setMouse)(index),
-            onMouseEnter: onMouseEnter(setOverItemIndex)(index),
-            onDragEnd: onDragEnd(cleanupDrag),
-            onTouchStart: onTouchStart(setTouch)(index),
-            onTouchMove: onTouchMove(setTouch),
-            onTouchEnd: onTouchEnd(cleanupDrag)
-          }
-        })
-      };
-    });
-  const [items, setItems] = useState(() => generateItems());
-  useEffect(() => {
-    setItems(() => generateItems());
-  }, [props.children]);
+  const initDraggableItem = useCallback(
+    index => ({
+      onMouseDown: onMouseDown(setMouse)(index),
+      onMouseEnter: onMouseEnter(setOverItemIndex)(index),
+      onDragEnd: onDragEnd(cleanupDrag),
+      onTouchStart: onTouchStart(setTouch)(index),
+      onTouchMove: onTouchMove(setTouch),
+      onTouchEnd: onTouchEnd(cleanupDrag)
+    }),
+    [setMouse, setOverItemIndex, cleanupDrag, setTouch]
+  );
+
+  const [items, reorder] = useItems({
+    children,
+    initDraggableItem
+  });
+
   const [overItemIndex, setOverItemIndex] = useState();
   const [dragItemPrevOrder, setDragItemPrevOrder] = useState();
   const [dragItemNewOrder, setDragItemNewOrder] = useState();
@@ -104,61 +94,24 @@ function DraggableMasonryLayout(props) {
   /////////////////////
 
   useEffect(() => {
-    const reorderReducer = (newOrder, item) => {
-      let order = item.order; // Item is out of range. Keep same order
+    // Reorder effect
+    if (
+      typeof dragItemIndex === "number" &&
+      typeof overItemIndex === "number" &&
+      overItemIndex !== dragItemIndex &&
+      !isRearranges
+    ) {
+      setDragItemNewOrder(items[overItemIndex].order);
+      setIsRearranges(true);
+      setTimeout(() => {
+        // console.log("rearrange is done");
+        setIsRearranges(false);
+      }, 500);
+      reorder({ overItemIndex, dragItemIndex });
+    }
+  }, [overItemIndex, dragItemIndex, items, isRearranges, reorder]);
 
-      // Override for items need to be changed
-      if (items[dragItemIndex].order < items[overItemIndex].order) {
-        // Drag toward the end
-        if (
-          item.order > items[dragItemIndex].order &&
-          item.order <= items[overItemIndex].order
-        )
-          // Inbetween notes. Replace on one to the start
-          order = item.order - 1;
-        else if (item.order === items[dragItemIndex].order)
-          // Assign new order to the draggable
-          order = items[overItemIndex].order;
-      } else if (items[dragItemIndex].order > items[overItemIndex].order) {
-        // Drag toward the start
-        if (
-          item.order < items[dragItemIndex].order &&
-          item.order >= items[overItemIndex].order
-        )
-          // Inbetween notes. Replace on one to the end
-          order = item.order + 1;
-        else if (item.order === items[dragItemIndex].order)
-          // Assign new order to the draggable
-          order = items[overItemIndex].order;
-      }
-      return newOrder.concat(order);
-    };
-
-    setItems(items => {
-      if (
-        typeof dragItemIndex === "number" &&
-        typeof overItemIndex === "number" &&
-        overItemIndex !== dragItemIndex &&
-        !isRearranges
-      ) {
-        setDragItemNewOrder(items[overItemIndex].order);
-        const newOrder = items.reduce(reorderReducer, []);
-        const newItems = items.map((item, index) => {
-          item.order = newOrder[index];
-          return item;
-        });
-        setIsRearranges(true);
-        setTimeout(() => {
-          // console.log("rearrange is done");
-          setIsRearranges(false);
-        }, 500);
-        return newItems;
-      }
-      return items;
-    });
-  }, [overItemIndex, dragItemIndex, items, isRearranges]);
-
-  const cleanupDrag = () => {
+  const cleanupDrag = useCallback(() => {
     // Mouse
     setMouse(null);
     // Touch
@@ -172,7 +125,7 @@ function DraggableMasonryLayout(props) {
     setDragPoint(null);
     setDragItemIndex(null);
     setOverItemIndex(null);
-  };
+  }, [setMouse, setTouch, setDrag, setDragPoint]);
 
   useEffect(() => {
     if (!touch && !ghost) {
@@ -419,7 +372,7 @@ function DraggableMasonryLayout(props) {
     }
     // Check layout
     const wrapperWidth = masonryLayout.current.offsetWidth;
-    const cardRefItem = items.find(item => !item.separator);
+    const cardRefItem = items.find(item => !item.isSeparator);
     const cardWrapperWidth =
       items[0].width ||
       document.getElementById(`${cardRefItem.id}-wrapper`).offsetWidth;
@@ -501,7 +454,7 @@ function DraggableMasonryLayout(props) {
       const maxNum = Math.max(...endline.byColumns);
       const maxNumIndex = endline.byColumns.indexOf(maxNum);
       let x, y;
-      if (item.separator) {
+      if (item.isSeparator) {
         x = 0;
         y = endline.byColumns[maxNumIndex];
         let newLine = endline.byColumns[maxNumIndex] + height;
