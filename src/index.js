@@ -7,6 +7,7 @@ import Ghost from "./Ghost";
 import {
   mouseMoveHandler,
   onMouseDown,
+  onMouseEnter,
   onTouchStart,
   onTouchMove
 } from "./utils/eventHandlers";
@@ -46,7 +47,7 @@ function DraggableMasonryLayout(props) {
           ...child.props,
           draggableItem: {
             onMouseDown: onMouseDown(setMouse)(index),
-            onMouseEnter: e => onMouseEnterItem(e, index),
+            onMouseEnter: onMouseEnter(setOverItemIndex)(index),
             onDragEnd: e => onDragEnd(e, index),
             onTouchStart: onTouchStart(setTouch)(index),
             onTouchMove: onTouchMove(setTouch),
@@ -243,8 +244,6 @@ function DraggableMasonryLayout(props) {
   const onMouseUp = e => {
     cleanupDrag();
   };
-
-  const onMouseEnterItem = (e, itemIndex) => setOverItemIndex(itemIndex);
 
   const onDragEnd = () => {
     // Cleanup after dragging
