@@ -10,7 +10,8 @@ import {
   onMouseEnter,
   onTouchStart,
   onTouchMove,
-  onDragEnd
+  onDragEnd,
+  onTouchEnd
 } from "./utils/eventHandlers";
 
 //////////////////////////////
@@ -52,7 +53,7 @@ function DraggableMasonryLayout(props) {
             onDragEnd: onDragEnd(cleanupDrag),
             onTouchStart: onTouchStart(setTouch)(index),
             onTouchMove: onTouchMove(setTouch),
-            onTouchEnd: e => onTouchEnd(),
+            onTouchEnd: onTouchEnd(cleanupDrag),
             onClick: e => onClickEvent()
           }
         })
@@ -68,7 +69,6 @@ function DraggableMasonryLayout(props) {
   const [isRearranges, setIsRearranges] = useState(false);
   // Touch events
   const [touch, setTouch] = useState(false);
-  const [UILog, setUILog] = useState("");
   // Mouse
   const [mouse, setMouse] = useState();
   // Drag events
@@ -163,14 +163,16 @@ function DraggableMasonryLayout(props) {
     // Mouse
     setMouse(null);
     // Touch
-    setTouch(false);
+    setTouch(touch => {
+      touch && clearTimeout(press);
+      touch && clearTimeout(longPress);
+      return false;
+    });
     // Drag
     setDrag(false);
     setDragPoint(null);
     setDragItemIndex(null);
     setOverItemIndex(null);
-    // Log
-    setUILog("cleanup");
   };
 
   useEffect(() => {
@@ -202,14 +204,6 @@ function DraggableMasonryLayout(props) {
       touch && touch.pos && clearTimeout(press);
     }
   }, [drag, items, overElementId, touch]);
-
-  const onTouchEnd = e => {
-    setUILog("touch end");
-    clearTimeout(press);
-    clearTimeout(longPress); // Cancel drag event for touch scn
-    cleanupDrag();
-    setTouch(false);
-  };
 
   useEffect(() => {
     setBodyDefaultOverflow(document.body.style.overflow);

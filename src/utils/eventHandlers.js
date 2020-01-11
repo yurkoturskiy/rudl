@@ -52,3 +52,7 @@ export const onTouchMove = setTouch => e => {
     pos
   }));
 };
+
+export const onTouchEnd = cleanupDrag => e =>
+  // Cleanup after dragging
+  cleanupDrag();
