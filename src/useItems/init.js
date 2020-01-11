@@ -9,7 +9,7 @@ const getSeparator = ({ child, index }) => ({
   element: child
 });
 
-const getItem = ({ child, index, initDraggableItem }) => ({
+const getItem = ({ child, index, getDraggableItemEvents }) => ({
   // Item is just a regular layout unit
   index: index,
   id: child.key,
@@ -19,15 +19,15 @@ const getItem = ({ child, index, initDraggableItem }) => ({
   height: child.props.height,
   element: React.cloneElement(child, {
     ...child.props,
-    draggableItem: initDraggableItem(index)
+    draggableItem: getDraggableItemEvents(index)
   })
 });
 
-const initItem = initDraggableItem => (child, index) =>
+const initItem = getDraggableItemEvents => (child, index) =>
   // Generate one item or separator
   child.props.isSeparator
     ? getSeparator({ child, index })
-    : getItem({ child, index, initDraggableItem });
+    : getItem({ child, index, getDraggableItemEvents });
 
-export default ({ children, initDraggableItem }) =>
-  React.Children.map(children, initItem(initDraggableItem));
+export default ({ children, getDraggableItemEvents }) =>
+  React.Children.map(children, initItem(getDraggableItemEvents));

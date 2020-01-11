@@ -16,9 +16,9 @@ const reducer = (state, action) => {
 const actionTemplate = dispatch => type => payload =>
   dispatch({ type, payload });
 
-export default function useItems({ children, initDraggableItem }) {
+export default function useItems({ children, getDraggableItemEvents }) {
   const [items, dispatch] = useReducer(reducer, [], () =>
-    init({ children, initDraggableItem })
+    init({ children, getDraggableItemEvents })
   );
 
   // Actions from template
@@ -28,8 +28,8 @@ export default function useItems({ children, initDraggableItem }) {
 
   useEffect(() => {
     // Update items when children changed
-    updateAction({ children, initDraggableItem });
-  }, [updateAction, children, initDraggableItem]);
+    updateAction({ children, getDraggableItemEvents });
+  }, [updateAction, children, getDraggableItemEvents]);
 
   return [items, reorderAction];
 }
