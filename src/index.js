@@ -2,7 +2,6 @@ import React, {
   useEffect,
   useRef,
   useState,
-  useReducer,
   useMemo,
   useCallback
 } from "react";
@@ -10,6 +9,7 @@ import PropTypes from "prop-types";
 import Ghost from "./components/Ghost";
 // Hooks
 import useItems from "./useItems/index";
+import useCursor from "./useCursor/index";
 // Event handlers
 import {
   mouseMoveHandler,
@@ -51,6 +51,8 @@ function DraggableMasonryLayout(props) {
     children,
     initDraggableItem
   });
+
+  const { cursor } = useCursor();
 
   const [overItemIndex, setOverItemIndex] = useState();
   const [dragItemPrevOrder, setDragItemPrevOrder] = useState();
