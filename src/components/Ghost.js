@@ -1,24 +1,44 @@
 import React from "react";
+import PropTypes from "prop-types";
 
-function Ghost(props) {
-  const { ghostTransitionDuration, ghostTransitionTimingFunction } = props;
-  return (
-    <div
-      style={{
-        position: "fixed",
-        visibility: "visible",
-        left: props.x,
-        top: props.y,
-        pointerEvents: "none",
-        transition: props.drag
-          ? "none"
-          : `left ${ghostTransitionDuration}ms ${ghostTransitionTimingFunction}, top ${ghostTransitionDuration}ms ${ghostTransitionTimingFunction}`
-      }}
-      onTransitionEnd={() => props.onGhostEndTransition()}
-    >
-      {props.children}
-    </div>
-  );
-}
+const Ghost = ({
+  x,
+  y,
+  drag,
+  ghostTransitionDuration,
+  ghostTransitionTimingFunction,
+  onGhostEndTransition,
+  children
+}) => (
+  <>
+    {children && (
+      <div
+        style={{
+          position: "fixed",
+          visibility: "visible",
+          left: x,
+          top: y,
+          pointerEvents: "none",
+          transition: drag
+            ? "none"
+            : `left ${ghostTransitionDuration}ms ${ghostTransitionTimingFunction}, top ${ghostTransitionDuration}ms ${ghostTransitionTimingFunction}`
+        }}
+        onTransitionEnd={() => onGhostEndTransition()}
+      >
+        {children}
+      </div>
+    )}
+  </>
+);
+
+Ghost.propTypes = {
+  x: PropTypes.number,
+  y: PropTypes.number,
+  drag: PropTypes.bool,
+  ghostTransitionDuration: PropTypes.number,
+  ghostTransitionTimingFunction: PropTypes.string,
+  onGhostEndTransition: PropTypes.func,
+  children: PropTypes.element
+};
 
 export default Ghost;
