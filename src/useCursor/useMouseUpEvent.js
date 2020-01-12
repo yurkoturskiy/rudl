@@ -1,13 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 
 const useMouseUpEvent = ({ eventAction }) => {
-  // Mouse up event
+  const onMouseUp = useCallback(eventAction("MOUSE_UP"), [eventAction]);
   useEffect(() => {
-    document.addEventListener("mouseup", eventAction("MOUSE_UP"));
-    return () => {
-      document.removeEventListener("mouseup", eventAction("MOUSE_UP"));
-    };
-  }, [eventAction]);
+    document.addEventListener("mouseup", onMouseUp);
+    return () => document.removeEventListener("mouseup", onMouseUp);
+  }, [onMouseUp]);
 };
 
 export default useMouseUpEvent;

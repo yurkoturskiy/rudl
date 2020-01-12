@@ -1,14 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 
 const useMouseMoveEvent = ({ isMouse, eventAction }) => {
-  // Mouse move event
+  const onMouseMove = useCallback(eventAction("MOUSE_MOVE"), [eventAction]);
+  // Mouse move event works only mouse is down
   useEffect(() => {
-    isMouse &&
-      document.addEventListener("mousemove", eventAction("MOUSE_MOVE"));
+    isMouse && document.addEventListener("mousemove", onMouseMove);
     return () =>
-      isMouse &&
-      document.removeEventListener("mousemove", eventAction("MOUSE_MOVE"));
-  }, [eventAction, isMouse]);
+      isMouse && document.removeEventListener("mousemove", onMouseMove);
+  }, [onMouseMove, isMouse]);
 };
 
 export default useMouseMoveEvent;
