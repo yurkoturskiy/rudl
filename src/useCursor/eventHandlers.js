@@ -12,7 +12,7 @@ export const mouseDown = ({ state, event, itemIndex }) => {
     ...state,
     isMouse: true,
     initialPos: pos,
-    dragItemIndex: itemIndex,
+    itemIndex,
     pos
   };
 };
@@ -34,7 +34,7 @@ export const touchStart = ({ state, event, itemIndex }) => {
     isTouch: true,
     initialPos: pos,
     numOfCursors: e.touches.length,
-    dragItemIndex: itemIndex,
+    itemIndex,
     pos
   };
 };

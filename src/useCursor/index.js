@@ -8,13 +8,15 @@ const init = () => ({
   isMouse: false,
   isTouch: false,
   initialPos: null,
+  itemIndex: null,
   pos: null,
   preventClick: false,
   numOfCursors: null,
-  dragItemIndex: null,
-  overItemIndex: null,
+  // Drag
   isDragging: false,
-  dragPoing: null
+  dragItemIndex: null,
+  dragPoing: null,
+  overItemIndex: null
 });
 
 const reducer = (state, action) => {
