@@ -51,12 +51,12 @@ function DraggableMasonryLayout(props) {
     [setMouse, setOverItemIndex, cleanupDrag, setTouch]
   );
 
+  const { cursor, getDraggableItemEvents } = useCursor();
+
   const [items, reorder] = useItems({
     children,
-    initDraggableItem
+    getDraggableItemEvents
   });
-
-  const { cursor } = useCursor();
 
   const [overItemIndex, setOverItemIndex] = useState();
   const [dragItemPrevOrder, setDragItemPrevOrder] = useState();
@@ -549,15 +549,17 @@ function DraggableMasonryLayout(props) {
         layoutIsMount={layoutIsMount}
       >
         {renderItems}
-        <Ghost
-          x={ghostPos.x}
-          y={ghostPos.y}
-          drag={drag}
-          component={ghost}
-          onGhostEndTransition={onGhostEndTransition}
-          ghostTransitionDuration={ghostTransitionDuration}
-          ghostTransitionTimingFunction={ghostTransitionTimingFunction}
-        />
+        {ghost && (
+          <Ghost
+            x={ghostPos.x}
+            y={ghostPos.y}
+            drag={drag}
+            component={ghost}
+            onGhostEndTransition={onGhostEndTransition}
+            ghostTransitionDuration={ghostTransitionDuration}
+            ghostTransitionTimingFunction={ghostTransitionTimingFunction}
+          />
+        )}
         {typeof layout.endline.start.y === "number" && (
           <Endline
             startRef={endlineStartRef}

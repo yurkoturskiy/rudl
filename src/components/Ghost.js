@@ -10,25 +10,21 @@ const Ghost = ({
   ghostTransitionTimingFunction,
   onGhostEndTransition
 }) => (
-  <>
-    {children && (
-      <div
-        style={{
-          position: "fixed",
-          visibility: "visible",
-          left: x,
-          top: y,
-          pointerEvents: "none",
-          transition: drag
-            ? "none"
-            : `left ${ghostTransitionDuration}ms ${ghostTransitionTimingFunction}, top ${ghostTransitionDuration}ms ${ghostTransitionTimingFunction}`
-        }}
-        onTransitionEnd={() => onGhostEndTransition()}
-      >
-        {component}
-      </div>
-    )}
-  </>
+  <div
+    style={{
+      position: "fixed",
+      visibility: "visible",
+      left: x,
+      top: y,
+      pointerEvents: "none",
+      transition: drag
+        ? "none"
+        : `left ${ghostTransitionDuration}ms ${ghostTransitionTimingFunction}, top ${ghostTransitionDuration}ms ${ghostTransitionTimingFunction}`
+    }}
+    onTransitionEnd={() => onGhostEndTransition()}
+  >
+    {component}
+  </div>
 );
 
 Ghost.propTypes = {
