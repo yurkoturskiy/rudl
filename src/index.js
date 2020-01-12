@@ -40,18 +40,6 @@ function DraggableMasonryLayout(props) {
     children
   } = props;
 
-  const initDraggableItem = useCallback(
-    index => ({
-      onMouseDown: onMouseDown(setMouse)(index),
-      onMouseEnter: onMouseEnter(setOverItemIndex)(index),
-      onDragEnd: onDragEnd(cleanupDrag),
-      onTouchStart: onTouchStart(setTouch)(index),
-      onTouchMove: onTouchMove(setTouch),
-      onTouchEnd: onTouchEnd(cleanupDrag)
-    }),
-    [setMouse, setOverItemIndex, cleanupDrag, setTouch]
-  );
-
   const { cursor, getDraggableItemEvents } = useCursor();
 
   const [items, reorder] = useItems({
