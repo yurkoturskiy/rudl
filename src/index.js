@@ -24,6 +24,7 @@ import BoundryBox from "./components/BoundryBox";
 import Ghost from "./components/Ghost";
 import Endline from "./components/Endline";
 import Header from "./components/Header";
+import ItemComponent from "./components/ItemComponent";
 
 //////////////////////////////
 /* Masonry layout component */
@@ -502,38 +503,33 @@ function DraggableMasonryLayout(props) {
 
   const loadHandler = index => setOnLoadCount(onLoadCount + 1);
 
-  const renderItems = items.map((item, index) => {
-    // Render eash child
-    const newComponent = (
-      <div
-        className="element-bounding"
-        id={`${item.id}-wrapper`}
-        key={`${item.id}-wrapper`}
-        style={{
-          position: "absolute",
-          margin: 0,
-          padding: 0,
-          userSelect: "none",
-          top: `${layout.elements[index] ? layout.elements[index].y : 0}px`,
-          left: `${layout.elements[index] ? layout.elements[index].x : 0}px`,
-          transition: `${
-            ghostSourceId !== item.id && transition && layoutIsMount
-              ? `top ${transitionDuration}ms ${transitionTimingFunction}, left ${transitionDuration}ms ${transitionTimingFunction}`
-              : "none"
-          }`,
-          visibility:
-            layout.elements[index] && layoutIsMount ? "visible" : "hidden",
-          opacity: ghost && ghostSourceId === items[index].id ? 0 : 1
-        }}
-        onLoad={loadHandler}
-        onError={errorHandler}
-        onClickCapture={onClickCapture}
-      >
-        {items[index].element}
-      </div>
-    );
-    return newComponent;
-  });
+  const renderItems = useMemo(
+    () =>
+      items.map((item, index) => (
+        <ItemComponent
+          item={item}
+          key={`${item.id}-wrapper`}
+          layoutElement={layout.elements[index]}
+          transition={transition}
+          layoutIsMount={layoutIsMount}
+          transitionDuration={transitionDuration}
+          transitionTimingFunction={transitionTimingFunction}
+          ghost={ghost}
+          loadHandler={loadHandler}
+          errorHandler={errorHandler}
+          onClickCapture={onClickCapture}
+        />
+      )),
+    [
+      ghost,
+      items,
+      layout.elements,
+      layoutIsMount,
+      transition,
+      transitionDuration,
+      transitionTimingFunction
+    ]
+  );
 
   return (
     <div className="masonry" ref={masonryLayout}>
