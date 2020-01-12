@@ -6,7 +6,6 @@ import React, {
   useCallback
 } from "react";
 import PropTypes from "prop-types";
-import Ghost from "./components/Ghost";
 // Hooks
 import useItems from "./useItems/index";
 import useCursor from "./useCursor/index";
@@ -20,6 +19,11 @@ import {
   onDragEnd,
   onTouchEnd
 } from "./utils/eventHandlers";
+// Components
+import BoundryBox from "./components/BoundryBox";
+import Ghost from "./components/Ghost";
+import Endline from "./components/Endline";
+import Header from "./components/Header";
 
 //////////////////////////////
 /* Masonry layout component */
@@ -534,66 +538,37 @@ function DraggableMasonryLayout(props) {
   return (
     <div className="masonry" ref={masonryLayout}>
       {props.header && layoutIsMount && (
-        <div
-          style={{
-            position: "relative",
-            width: `${layout.width}px`,
-            margin: "0 auto 0 auto"
-          }}
-        >
-          {props.header}
-        </div>
+        <Header width={layout.width} component={props.header} />
       )}
-      <div
-        style={{
-          position: "relative",
-          width: `${layout.width}px`,
-          height: `${layout.height}px`,
-          margin: "0 auto 0 auto",
-          // outline: "1px solid red",
-          transition:
-            transition && layoutIsMount
-              ? `width ${transitionDuration}ms ${transitionTimingFunction}`
-              : "none"
-        }}
-        className="boundry-box"
+      <BoundryBox
+        width={layout.width}
+        height={layout.height}
+        transitionDuration={transitionDuration}
+        transitionTimingFunction={transitionTimingFunction}
+        transition={transition}
+        layoutIsMount={layoutIsMount}
       >
         {renderItems}
-        {ghost && (
-          <Ghost
-            x={ghostPos.x}
-            y={ghostPos.y}
-            drag={drag}
-            onGhostEndTransition={onGhostEndTransition}
-            ghostTransitionDuration={ghostTransitionDuration}
-            ghostTransitionTimingFunction={ghostTransitionTimingFunction}
-          >
-            {ghost}
-          </Ghost>
-        )}
+        <Ghost
+          x={ghostPos.x}
+          y={ghostPos.y}
+          drag={drag}
+          component={ghost}
+          onGhostEndTransition={onGhostEndTransition}
+          ghostTransitionDuration={ghostTransitionDuration}
+          ghostTransitionTimingFunction={ghostTransitionTimingFunction}
+        />
         {typeof layout.endline.start.y === "number" && (
-          <React.Fragment>
-            <div
-              id="MasonryLayoutEndlineStart"
-              ref={endlineStartRef}
-              style={{
-                position: "absolute",
-                top: `${layout.endline.start.y}px`,
-                left: `${layout.endline.start.x}px`
-              }}
-            />
-            <div
-              id="MasonryLayoutEndlineEnd"
-              ref={endlineEndRef}
-              style={{
-                position: "absolute",
-                top: `${layout.endline.end.y}px`,
-                left: `${layout.endline.end.x}px`
-              }}
-            />
-          </React.Fragment>
+          <Endline
+            startRef={endlineStartRef}
+            endRef={endlineEndRef}
+            startX={layout.endline.start.x}
+            startY={layout.endline.start.y}
+            endX={layout.endline.end.x}
+            endY={layout.endline.end.y}
+          />
         )}
-      </div>
+      </BoundryBox>
     </div>
   );
 }
