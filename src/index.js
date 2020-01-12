@@ -9,16 +9,6 @@ import PropTypes from "prop-types";
 // Hooks
 import useItems from "./useItems/index";
 import useCursor from "./useCursor/index";
-// Event handlers
-import {
-  mouseMoveHandler,
-  onMouseDown,
-  onMouseEnter,
-  onTouchStart,
-  onTouchMove,
-  onDragEnd,
-  onTouchEnd
-} from "./utils/eventHandlers";
 // Components
 import BoundryBox from "./components/BoundryBox";
 import Ghost from "./components/Ghost";
@@ -70,19 +60,6 @@ function DraggableMasonryLayout(props) {
     bodyDefaultOverscrollBehaviorY,
     setBodyDefaultOverscrollBehaviorY
   ] = useState();
-
-  // Track mouse position only if dragItemIndex is defined
-  const onMouseMove = useMemo(() => mouseMoveHandler(setMouse), [setMouse]);
-  useEffect(() => {
-    mouse &&
-      mouse.isDown &&
-      document.addEventListener("mousemove", onMouseMove);
-    return () => {
-      mouse &&
-        mouse.isDown &&
-        document.removeEventListener("mousemove", onMouseMove);
-    };
-  }, [mouse, onMouseMove]);
 
   /////////////////////
   /* Events' methods */
@@ -162,13 +139,6 @@ function DraggableMasonryLayout(props) {
   //////////////////
 
   useEffect(() => {
-    document.addEventListener("mouseup", onMouseUp);
-    return () => {
-      document.removeEventListener("mouseup", onMouseUp);
-    };
-  }, []);
-
-  useEffect(() => {
     if (
       typeof dragItemPrevOrder === "number" &&
       typeof dragItemNewOrder === "number" &&
@@ -182,10 +152,6 @@ function DraggableMasonryLayout(props) {
       setDragItemNewOrder(null);
     }
   }, [dragItemNewOrder, dragItemIndex, items, dragItemPrevOrder, props, drag]);
-
-  const onMouseUp = e => {
-    cleanupDrag();
-  };
 
   const onClickCapture = e => {
     // Prevent onClick event when dragging
