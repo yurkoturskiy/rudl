@@ -1,42 +1,51 @@
-import React, { useReducer, useEffect, useMemo, useCallback } from "react";
-import { mouseMove, mouseDown, mouseEnter, touchMove } from "./eventHandlers";
+import React, { useReducer, useEffect, useCallback } from "react";
+// Event handlers
+import {
+  initState,
+  // Mouse
+  mouseMove,
+  mouseEnter,
+  mouseDown,
+  clickCapture,
+  // Touch
+  touchStart,
+  touchMove,
+  // Gestures
+  press,
+  longPress
+} from "./reducerEventsHandlers";
 // Hooks
 import useMouseMoveEvent from "./useMouseMoveEvent";
 import useMouseUpEvent from "./useMouseUpEvent";
 
-const init = () => ({
-  isMouse: false,
-  isTouch: false,
-  initialPos: null,
-  itemIndex: null,
-  pos: null,
-  preventClick: false,
-  numOfCursors: null,
-  // Drag
-  isDragging: false,
-  dragItemIndex: null,
-  dragPoing: null,
-  overItemIndex: null
-});
 
 const reducer = (state, action) => {
   switch (action.type) {
+    // Mouse
     case "MOUSE_MOVE":
       return mouseMove({ state, ...action.payload });
+    case "MOUSE_ENTER":
+      return mouseEnter({ state, ...action.payload });
     case "MOUSE_DOWN":
       return mouseDown({ state, ...action.payload });
     case "MOUSE_UP":
-      return init();
-    case "MOUSE_ENTER":
-      return mouseEnter({ state, ...action.payload });
+      return initState({ state });
     case "DRAG_END":
-      return init();
+      return initState({ state });
+    case "CLICK_CAPTURE":
+      return clickCapture({ state, ...action.payload });
+    // Touch
     case "TOUCH_START":
       return touchStart({ state, ...action.payload });
     case "TOUCH_MOVE":
       return touchMove({ state, ...action.payload });
     case "TOUCH_END":
-      return init();
+      return initState({ state });
+    // Touch gestures
+    case "PRESS":
+      return press({ state });
+    case "LONG_PRESS":
+      return longPress({ state });
     default:
       return state;
   }
