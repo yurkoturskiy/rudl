@@ -15,9 +15,7 @@ import {
   longPress
 } from "./reducerEventsHandlers";
 // Hooks
-import useMouseMoveEvent from "./useMouseMoveEvent";
-import useMouseUpEvent from "./useMouseUpEvent";
-
+import useDocumentEvents from "./useDocumentEvents";
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -81,11 +79,11 @@ function useCursor() {
     }),
     [eventAction, itemEventAction]
   );
+  // Global scope cursor events
+  useDocumentEvents({ ...cursor, eventAction });
   // Log effect
   useEffect(() => console.log(cursor), [cursor]);
 
-  useMouseMoveEvent({ isMouse: cursor.isMouse, eventAction });
-  useMouseUpEvent({ eventAction });
 
   return { cursor, getDraggableItemEvents };
 }
