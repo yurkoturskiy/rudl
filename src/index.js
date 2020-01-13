@@ -7,8 +7,9 @@ import React, {
 } from "react";
 import PropTypes from "prop-types";
 // Hooks
-import useItems from "./useItems/index";
 import useCursor from "./useCursor/index";
+import useItems from "./useItems/index";
+import useGhost from "./useGhost/index";
 // Components
 import BoundryBox from "./components/BoundryBox";
 import Ghost from "./components/Ghost";
@@ -31,12 +32,12 @@ function DraggableMasonryLayout(props) {
   } = props;
 
   const [cursor, getDraggableItemEvents] = useCursor();
-
   const [items, reorder] = useItems({
     children,
     getDraggableItemEvents,
     cursor
   });
+  const newGhost = useGhost(cursor, items);
 
   const [overItemIndex, setOverItemIndex] = useState(); // cursor instance
   const [dragItemPrevOrder, setDragItemPrevOrder] = useState(); // items instance
