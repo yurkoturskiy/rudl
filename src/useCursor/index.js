@@ -51,22 +51,24 @@ const reducer = (state, action) => {
   }
 };
 
-// Action factories
+// Reducer's action factories
+const plainDispatcher = dispatch => type => () => dispatch({ type });
 const eventDispatcher = dispatch => type => event =>
   dispatch({ type, payload: { event } });
+const itemEventDispatcher = dispatch => type => item => event =>
+  dispatch({ type, payload: { event, item } });
 
-const itemEventDispatcher = dispatch => type => itemIndex => event =>
-  dispatch({ type, payload: { event, itemIndex } });
-
-export default function useCursor() {
-  const [cursor, dispatch] = useReducer(reducer, {}, init);
-
-  // Actions factories
-  const eventAction = useCallback(eventDispatcher(dispatch), [dispatch]);
-  const itemEventAction = useCallback(itemEventDispatcher(dispatch), [
-    dispatch
-  ]);
-
+// Hook
+function useCursor() {
+  const [cursor, dispatch] = useReducer(reducer, {}, initState);
+  // Blank actions
+  // () => plainAction("SOME_ACTION")
+  const plainAction = useCallback(plainDispatcher(dispatch), []);
+  // (e) => eventAction("SOME_ACTION")
+  const eventAction = useCallback(eventDispatcher(dispatch), []);
+  // (e) => itemEventAction("SOME_ACTION")(index)
+  const itemEventAction = useCallback(itemEventDispatcher(dispatch), []);
+  // Item's scope cursor events
   const getDraggableItemEvents = useCallback(
     index => ({
       onMouseDown: itemEventAction("MOUSE_DOWN")(index),
