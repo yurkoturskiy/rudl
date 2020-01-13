@@ -84,8 +84,9 @@ function useCursor() {
   useDocumentEvents({ ...cursor, eventAction });
   usePress({ plainAction, ...cursor });
   // Log effect
-  useEffect(() => console.log(cursor), [cursor]);
+  // useEffect(() => console.log(cursor), [cursor]);
 
-
-  return { cursor, getDraggableItemEvents };
+  return [cursor, getDraggableItemEvents];
 }
+
+export default useCursor;

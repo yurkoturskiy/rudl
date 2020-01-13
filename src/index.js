@@ -30,11 +30,12 @@ function DraggableMasonryLayout(props) {
     children
   } = props;
 
-  const { cursor, getDraggableItemEvents } = useCursor();
+  const [cursor, getDraggableItemEvents] = useCursor();
 
   const [items, reorder] = useItems({
     children,
-    getDraggableItemEvents
+    getDraggableItemEvents,
+    cursor
   });
 
   const [overItemIndex, setOverItemIndex] = useState();
