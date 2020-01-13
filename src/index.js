@@ -38,10 +38,10 @@ function DraggableMasonryLayout(props) {
     cursor
   });
 
-  const [overItemIndex, setOverItemIndex] = useState();
-  const [dragItemPrevOrder, setDragItemPrevOrder] = useState();
-  const [dragItemNewOrder, setDragItemNewOrder] = useState();
-  const [isRearranges, setIsRearranges] = useState(false);
+  const [overItemIndex, setOverItemIndex] = useState(); // cursor instance
+  const [dragItemPrevOrder, setDragItemPrevOrder] = useState(); // items instance
+  const [dragItemNewOrder, setDragItemNewOrder] = useState(); // items instance
+  const [isRearranges, setIsRearranges] = useState(false); // items instance
   // Touch events
   const [touch, setTouch] = useState(false);
   // Mouse
@@ -49,7 +49,6 @@ function DraggableMasonryLayout(props) {
   // Drag events
   const [drag, setDrag] = useState(false);
   const [dragItemIndex, setDragItemIndex] = useState();
-  const [preventClick, setPreventClick] = useState();
   const [dragPoint, setDragPoint] = useState();
   // Ghost
   const [ghost, setGhost] = useState();
@@ -84,22 +83,6 @@ function DraggableMasonryLayout(props) {
     }
   }, [overItemIndex, dragItemIndex, items, isRearranges, reorder]);
 
-  const cleanupDrag = useCallback(() => {
-    // Mouse
-    setMouse(null);
-    // Touch
-    setTouch(touch => {
-      touch && clearTimeout(press);
-      touch && clearTimeout(longPress);
-      return false;
-    });
-    // Drag
-    setDrag(false);
-    setDragPoint(null);
-    setDragItemIndex(null);
-    setOverItemIndex(null);
-  }, [setMouse, setTouch, setDrag, setDragPoint]);
-
   useEffect(() => {
     if (!touch && !ghost) {
       document.body.style.overflow = bodyDefaultOverflow;
@@ -110,25 +93,6 @@ function DraggableMasonryLayout(props) {
   //////////////////////////
   /* Touch screens events */
   //////////////////////////
-
-  // Trigger on touch move
-  const overElementId = useMemo(
-    () =>
-      touch &&
-      touch.pos &&
-      drag &&
-      document.elementFromPoint(touch.pos.x, touch.pos.y).id,
-    [touch, drag]
-  );
-  useEffect(() => {
-    if (drag && overElementId) {
-      const overElementItem = items.find(item => item.id === overElementId);
-      setOverItemIndex(overElementItem && overElementItem.index);
-    } else {
-      touch && touch.pos && clearTimeout(longPress);
-      touch && touch.pos && clearTimeout(press);
-    }
-  }, [drag, items, overElementId, touch]);
 
   useEffect(() => {
     setBodyDefaultOverflow(document.body.style.overflow);
@@ -154,11 +118,6 @@ function DraggableMasonryLayout(props) {
     }
   }, [dragItemNewOrder, dragItemIndex, items, dragItemPrevOrder, props, drag]);
 
-  const onClickCapture = e => {
-    // Prevent onClick event when dragging
-    preventClick && e.stopPropagation();
-  };
-
   useEffect(() => {
     // Set drag
     if (mouse && mouse.isDown && mouse.pos && !drag) {
@@ -168,7 +127,6 @@ function DraggableMasonryLayout(props) {
         Math.abs(mouse.pos.y - mouse.initialPos.y) >= 3
       ) {
         setDrag(true);
-        setPreventClick(true);
         setDragItemPrevOrder(items[mouse.itemIndex].order);
         setDragItemIndex(mouse.itemIndex);
       }
@@ -188,27 +146,6 @@ function DraggableMasonryLayout(props) {
         }, 500);
     }
   }, [touch, mouse, drag, items]);
-
-  useEffect(() => {
-    // Start dragging
-    if (drag && (touch || mouse) && !ghost && !dragPoint) {
-      try {
-        const dragElementRect = document
-          .getElementById(`${items[dragItemIndex].id}-wrapper`)
-          .getBoundingClientRect();
-        setDragPoint({
-          x:
-            (touch ? touch.initialPos.x : mouse.initialPos.x) -
-            dragElementRect.left,
-          y:
-            (touch ? touch.initialPos.y : mouse.initialPos.y) -
-            dragElementRect.top
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    }
-  }, [drag, dragItemIndex, touch, items, ghost, mouse, dragPoint]);
 
   ////////////
   /* Ghost */
@@ -271,7 +208,6 @@ function DraggableMasonryLayout(props) {
     clearTimeout(ghostTimeout);
     setGhost(null);
     setGhostPos(null);
-    setPreventClick(false);
   };
 
   useEffect(() => {
@@ -472,7 +408,6 @@ function DraggableMasonryLayout(props) {
           ghost={ghost}
           loadHandler={loadHandler}
           errorHandler={errorHandler}
-          onClickCapture={onClickCapture}
         />
       )),
     [
