@@ -15,6 +15,7 @@ import {
   longPress
 } from "./reducerEventsHandlers";
 // Hooks
+import usePress from "./usePress";
 import useDocumentEvents from "./useDocumentEvents";
 
 const reducer = (state, action) => {
@@ -81,6 +82,7 @@ function useCursor() {
   );
   // Global scope cursor events
   useDocumentEvents({ ...cursor, eventAction });
+  usePress({ plainAction, ...cursor });
   // Log effect
   useEffect(() => console.log(cursor), [cursor]);
 
