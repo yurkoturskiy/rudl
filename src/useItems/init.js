@@ -19,7 +19,7 @@ const getItem = ({ child, index, getDraggableItemEvents }) => ({
   height: child.props.height,
   element: React.cloneElement(child, {
     ...child.props,
-    draggableItem: getDraggableItemEvents(index)
+    draggableItem: getDraggableItemEvents({ index, id: child.key })
   })
 });
 
@@ -29,5 +29,12 @@ const initItem = getDraggableItemEvents => (child, index) =>
     ? getSeparator({ child, index })
     : getItem({ child, index, getDraggableItemEvents });
 
-export default ({ children, getDraggableItemEvents }) =>
+const getListOfItems = ({ children, getDraggableItemEvents }) =>
   React.Children.map(children, initItem(getDraggableItemEvents));
+
+export default ({ children, getDraggableItemEvents }) => ({
+  draggablePrevOrder: null,
+  draggableNewOrder: null,
+  isRearranges: false,
+  list: getListOfItems({ children, getDraggableItemEvents })
+});
