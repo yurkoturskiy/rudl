@@ -1,79 +1,92 @@
-import React, { useReducer, useEffect, useMemo, useCallback } from "react";
-import { mouseMove, mouseDown, mouseEnter, touchMove } from "./eventHandlers";
+import React, { useReducer, useEffect, useCallback } from "react";
+// Event handlers
+import {
+  initState,
+  // Mouse
+  mouseMove,
+  mouseEnter,
+  mouseDown,
+  clickCapture,
+  // Touch
+  touchStart,
+  touchMove,
+  // Gestures
+  press,
+  longPress
+} from "./reducerEventsHandlers";
 // Hooks
-import useMouseMoveEvent from "./useMouseMoveEvent";
-import useMouseUpEvent from "./useMouseUpEvent";
-
-const init = () => ({
-  isMouse: false,
-  isTouch: false,
-  initialPos: null,
-  itemIndex: null,
-  pos: null,
-  preventClick: false,
-  numOfCursors: null,
-  // Drag
-  isDragging: false,
-  dragItemIndex: null,
-  dragPoing: null,
-  overItemIndex: null
-});
+import usePress from "./usePress";
+import useDocumentEvents from "./useDocumentEvents";
 
 const reducer = (state, action) => {
   switch (action.type) {
+    // Mouse
     case "MOUSE_MOVE":
       return mouseMove({ state, ...action.payload });
+    case "MOUSE_ENTER":
+      return mouseEnter({ state, ...action.payload });
     case "MOUSE_DOWN":
       return mouseDown({ state, ...action.payload });
     case "MOUSE_UP":
-      return init();
-    case "MOUSE_ENTER":
-      return mouseEnter({ state, ...action.payload });
+      return initState({ state });
     case "DRAG_END":
-      return init();
+      return initState({ state });
+    case "CLICK_CAPTURE":
+      return clickCapture({ state, ...action.payload });
+    // Touch
     case "TOUCH_START":
       return touchStart({ state, ...action.payload });
     case "TOUCH_MOVE":
       return touchMove({ state, ...action.payload });
     case "TOUCH_END":
-      return init();
+      return initState({ state });
+    // Touch gestures
+    case "PRESS":
+      return press({ state });
+    case "LONG_PRESS":
+      return longPress({ state });
     default:
       return state;
   }
 };
 
-// Action factories
+// Reducer's action factories
+const plainDispatcher = dispatch => type => () => dispatch({ type });
 const eventDispatcher = dispatch => type => event =>
   dispatch({ type, payload: { event } });
+const itemEventDispatcher = dispatch => type => item => event =>
+  dispatch({ type, payload: { event, item } });
 
-const itemEventDispatcher = dispatch => type => itemIndex => event =>
-  dispatch({ type, payload: { event, itemIndex } });
-
-export default function useCursor() {
-  const [cursor, dispatch] = useReducer(reducer, {}, init);
-
-  // Actions factories
-  const eventAction = useCallback(eventDispatcher(dispatch), [dispatch]);
-  const itemEventAction = useCallback(itemEventDispatcher(dispatch), [
-    dispatch
-  ]);
-
+// Hook
+function useCursor() {
+  const [cursor, dispatch] = useReducer(reducer, {}, initState);
+  // Blank actions
+  // () => plainAction("SOME_ACTION")
+  const plainAction = useCallback(plainDispatcher(dispatch), []);
+  // (e) => eventAction("SOME_ACTION")
+  const eventAction = useCallback(eventDispatcher(dispatch), []);
+  // (e) => itemEventAction("SOME_ACTION")(index)
+  const itemEventAction = useCallback(itemEventDispatcher(dispatch), []);
+  // Item's scope cursor events
   const getDraggableItemEvents = useCallback(
-    index => ({
-      onMouseDown: itemEventAction("MOUSE_DOWN")(index),
-      onMouseEnter: itemEventAction("MOUSE_ENTER")(index),
+    ({ index, id }) => ({
+      onMouseDown: itemEventAction("MOUSE_DOWN")({ index, id }),
+      onMouseEnter: itemEventAction("MOUSE_ENTER")({ index, id }),
       onDragEnd: eventAction("DRAG_END"),
-      onTouchStart: itemEventAction("TOUCH_START")(index),
-      onTouchMove: eventAction("TOUCH_MOVE"),
-      onTouchEnd: eventAction("TOUCH_END")
+      onTouchStart: itemEventAction("TOUCH_START")({ index, id }),
+      // onTouchMove: itemEventAction("TOUCH_MOVE")(index),
+      onTouchEnd: eventAction("TOUCH_END"),
+      onClickCapture: eventAction("CLICK_CAPTURE")
     }),
-    [itemEventAction, eventAction]
+    [eventAction, itemEventAction]
   );
+  // Global scope cursor events
+  useDocumentEvents({ ...cursor, eventAction });
+  usePress({ plainAction, ...cursor });
   // Log effect
-  useEffect(() => console.log(cursor), [cursor]);
+  // useEffect(() => console.log(cursor), [cursor]);
 
-  useMouseMoveEvent({ isMouse: cursor.isMouse, eventAction });
-  useMouseUpEvent({ eventAction });
-
-  return { cursor, getDraggableItemEvents };
+  return [cursor, getDraggableItemEvents];
 }
+
+export default useCursor;

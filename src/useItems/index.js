@@ -16,7 +16,7 @@ const reducer = (state, action) => {
 const actionTemplate = dispatch => type => payload =>
   dispatch({ type, payload });
 
-export default function useItems({ children, getDraggableItemEvents }) {
+function useItems({ children, getDraggableItemEvents, cursor }) {
   const [items, dispatch] = useReducer(reducer, [], () =>
     init({ children, getDraggableItemEvents })
   );
@@ -31,5 +31,7 @@ export default function useItems({ children, getDraggableItemEvents }) {
     updateAction({ children, getDraggableItemEvents });
   }, [updateAction, children, getDraggableItemEvents]);
 
-  return [items, reorderAction];
+  return [items.list, reorderAction];
 }
+
+export default useItems;
