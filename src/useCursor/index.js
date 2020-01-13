@@ -70,15 +70,16 @@ function useCursor() {
   const itemEventAction = useCallback(itemEventDispatcher(dispatch), []);
   // Item's scope cursor events
   const getDraggableItemEvents = useCallback(
-    index => ({
-      onMouseDown: itemEventAction("MOUSE_DOWN")(index),
-      onMouseEnter: itemEventAction("MOUSE_ENTER")(index),
+    ({ index, id }) => ({
+      onMouseDown: itemEventAction("MOUSE_DOWN")({ index, id }),
+      onMouseEnter: itemEventAction("MOUSE_ENTER")({ index, id }),
       onDragEnd: eventAction("DRAG_END"),
-      onTouchStart: itemEventAction("TOUCH_START")(index),
-      onTouchMove: eventAction("TOUCH_MOVE"),
-      onTouchEnd: eventAction("TOUCH_END")
+      onTouchStart: itemEventAction("TOUCH_START")({ index, id }),
+      // onTouchMove: itemEventAction("TOUCH_MOVE")(index),
+      onTouchEnd: eventAction("TOUCH_END"),
+      onClickCapture: eventAction("CLICK_CAPTURE")
     }),
-    [itemEventAction, eventAction]
+    [eventAction, itemEventAction]
   );
   // Log effect
   useEffect(() => console.log(cursor), [cursor]);
