@@ -17,9 +17,9 @@ The main goal of RUDL is to provide seamless transition between different layout
 npm install --save rudl
 ```
 
-## Donation :two_hearts:
+## Buy me a coffee :coffee:
 
-Your donations will help to develop RUDL faster. Please support :blush:
+Coffee will help me to develop RUDL faster.
 
 Bitcoin wallet: `19fxW81ApuCbAu2tW8WebxRQqaoje6YbhJ`
 
