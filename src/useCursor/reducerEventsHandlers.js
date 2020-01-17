@@ -40,7 +40,7 @@ export const initState = ({ state } = {}) => ({
   numOfCursors: null,
   // Item scope
   item: null,
-  itemInitPoint: null,
+  dragPoint: null,
   overItem: null
 });
 
@@ -65,7 +65,7 @@ export const mouseDown = ({ state, event, item }) => {
     initialPos: pos,
     item,
     pos,
-    itemInitPoint: tryCalcItemInitPoint(pos, item)
+    dragPoint: tryCalcItemInitPoint(pos, item)
   };
 };
 
@@ -124,5 +124,5 @@ export const longPress = ({ state }) => ({
   ...state,
   isLongPress: !state.isMove,
   isDrag: !state.isMove,
-  itemInitPoint: tryCalcItemInitPoint(state.initialPos, state.item)
+  dragPoint: tryCalcItemInitPoint(state.initialPos, state.item)
 });
