@@ -56,8 +56,6 @@ function DraggableMasonryLayout(props) {
   const [dragPoint, setDragPoint] = useState();
   // Ghost
   const [ghost, setGhost] = useState();
-  const [ghostPos, setGhostPos] = useState();
-  const [ghostSourceId, setGhostSourceId] = useState();
   // Body
   const [bodyDefaultOverflow, setBodyDefaultOverflow] = useState();
   const [
@@ -150,77 +148,6 @@ function DraggableMasonryLayout(props) {
         }, 500);
     }
   }, [touch, mouse, drag, items]);
-
-  ////////////
-  /* Ghost */
-  ///////////
-  useEffect(() => {
-    // Ghost positioning effect
-    if (drag && dragPoint && (touch || mouse)) {
-      if (!ghost) {
-        // Create ghost
-        const sourceId = items[dragItemIndex].id;
-        const id = `${sourceId}-ghost`;
-        let sourceElement = document.getElementById(sourceId);
-        const sourceClassList = sourceElement.classList;
-        sourceElement.classList.add("ghost", touch && "touch"); // Add classNames to source to animate styles
-        // Set Ghost element
-        const newClassNames = `ghost ${touch && "touch"}`;
-        const className = `${sourceClassList} ${newClassNames}`;
-        const component = React.cloneElement(items[dragItemIndex].element, {
-          draggableItem: { id, className }
-        }); // Clone source
-        setGhost(component);
-      }
-      !ghostSourceId && setGhostSourceId(items[dragItemIndex].id);
-      // Set ghost position to mouse move position
-      setGhostPos({
-        x: (touch ? touch.pos.x : mouse.pos.x) - dragPoint.x,
-        y: (touch ? touch.pos.y : mouse.pos.y) - dragPoint.y
-      });
-    } else if (!drag && ghost) {
-      try {
-        // Move ghost to the source position
-        const rect = document
-          .getElementById(`${ghostSourceId}-wrapper`)
-          .getBoundingClientRect();
-        const x = rect.left;
-        const y = rect.top;
-        setGhostPos({ x, y });
-      } catch (err) {
-        console.error(err);
-      }
-      ghostTimeout = setTimeout(() => {
-        // If onTransitionEnd event was not triggered
-        onGhostEndTransition();
-      }, ghostTransitionDuration + 100);
-    }
-  }, [
-    mouse,
-    touch,
-    drag,
-    dragPoint,
-    dragItemIndex,
-    ghost,
-    items,
-    ghostSourceId,
-    ghostTransitionDuration
-  ]);
-
-  const onGhostEndTransition = () => {
-    // Turn-off ghost
-    clearTimeout(ghostTimeout);
-    setGhost(null);
-    setGhostPos(null);
-  };
-
-  useEffect(() => {
-    // Clean source element. Transit to original styles
-    if (!ghost && ghostSourceId) {
-      document.getElementById(ghostSourceId).classList.remove("ghost", "touch");
-      setGhostSourceId(null);
-    }
-  }, [ghost, ghostSourceId]);
 
   ////////////////////
   /* Masonry Layout */
