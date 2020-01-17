@@ -13,10 +13,10 @@ const reducer = (state, action) => {
       });
     case "MOVE": // On cursor move
       return move({ state, cursor: action.payload.cursor });
-    case "TRANSITION_END":
-      break;
     case "DROP": // On cursor end drag
       return drop({ state });
+    case "END": // On transition end
+      return end({ state });
     default:
       return state;
   }

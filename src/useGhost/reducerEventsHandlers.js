@@ -124,3 +124,14 @@ export const drop = ({ state }) => ({
   pos: getWrapperFixedPosFromSourceId(state.source.id),
   transitionTimeout: setTimeout(state.onTransitionEnd, state.transDur + 100)
 });
+
+const resetSourceClassList = source =>
+  source.element.classList.remove("ghost", "touch");
+
+export const end = ({ state }) => {
+  console.log("end");
+  resetSourceClassList(state.source);
+  clearTimeout(state.transitionTimeout);
+  return initState({ state });
+};
+
