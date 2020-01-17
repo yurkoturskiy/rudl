@@ -1,10 +1,10 @@
 import React, { useReducer, useEffect, useCallback } from "react";
-import { initState } from "./reducerEventsHandlers";
+import { initState, drag } from "./reducerEventsHandlers";
 
 const reducer = (state, action) => {
   switch (action.type) {
     case "DRAG":
-      break;
+      return drag({ state, ...action.payload });
     case "MOVE":
       break;
     case "DROP":
@@ -36,7 +36,7 @@ function useGhost(cursor, items) {
   const onTransitionEnd = useCallback(plainAction("TRANSITION_END"), []);
   // Trigger actions
   useEffect(() => {
-    cursor.isDrag && onDrag({ cursor, items });
+    cursor.isDrag && onDrag({ cursor, item: items[cursor.item.index] });
     cursor.isDrag && cursor.isMove && onMove({ cursor });
     !cursor.isDrag && onDrop();
   }, [cursor, cursor.isDrag, items, onDrag, onDrop, onMove]);
