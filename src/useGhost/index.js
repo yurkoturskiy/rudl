@@ -20,25 +20,22 @@ const reducer = (state, action) => {
   }
 };
 
-// Reducer's action factories
-const plainDispatcher = dispatch => type => () => dispatch({ type });
+// Reducer's action factory
 const payloadDispatcher = dispatch => type => payload =>
   dispatch({ type, payload });
 
 // Hook
-function useGhost(cursor, items) {
-  const [ghost, dispatch] = useReducer(reducer, {}, initState);
-  // Blank actions
-  // () => plainAction("SOME_ACTION")
-  const plainAction = useCallback(plainDispatcher(dispatch), []);
-  // ({ cursor, items }) => payloadAction("SOME_ACTION")
-  const payloadAction = useCallback(payloadDispatcher(dispatch), []);
+function useGhost(cursor, items, transitionParams) {
+  const [state, dispatch] = useReducer(reducer, {}, initState);
+  // (payload) => setAction("SOME_ACTION")
+  const setAction = useCallback(payloadDispatcher(dispatch), []);
   // Actions
-  const onDrag = useCallback(payloadAction("DRAG"), []);
-  const onMove = useCallback(payloadAction("MOVE"), []);
-  const onDrop = useCallback(plainAction("DROP"), []);
-  const onTransitionEnd = useCallback(plainAction("TRANSITION_END"), []);
-  // Trigger actions
+  const onStart = useCallback(setAction("START"), []);
+  const onMove = useCallback(setAction("MOVE"), []);
+  const onDrop = useCallback(setAction("DROP"), []);
+  // Ghost component action
+  const onTransitionEnd = useCallback(setAction("END"), []);
+
   useEffect(() => {
     cursor.isDrag && onDrag({ cursor, item: items[cursor.item.index] });
     cursor.isDrag && cursor.isMove && onMove({ cursor });

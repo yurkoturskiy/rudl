@@ -37,7 +37,10 @@ function DraggableMasonryLayout(props) {
     getDraggableItemEvents,
     cursor
   });
-  const newGhost = useGhost(cursor, items);
+  const newGhost = useGhost(cursor, items, {
+    ghostTransitionTimingFunction,
+    ghostTransitionDuration
+  });
 
   const [overItemIndex, setOverItemIndex] = useState(); // cursor instance
   const [dragItemPrevOrder, setDragItemPrevOrder] = useState(); // items instance
