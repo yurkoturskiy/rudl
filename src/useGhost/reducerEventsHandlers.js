@@ -4,12 +4,24 @@ import { cloneElement } from "react";
 export const initState = ({ state } = {}) => ({
   ...state,
   isActive: false,
+  isDrop: false,
+  isTransit: false,
   id: null,
   pos: null,
   source: null,
   className: null,
-  component: null
+  kernel: null,
+  transDur: null,
+  transTFunc: null,
+  onTransitionEnd: null,
+  transitionTimeout: null
 });
+
+const log = label => value => {
+  console.log(label, value);
+  return value;
+};
+
 const calcGhostPos = cursor => ({
   x: cursor.pos.x - cursor.dragPoint.x,
   y: cursor.pos.y - cursor.dragPoint.y
@@ -41,7 +53,7 @@ const setGhostClassName = ghost => ({
 });
 const setGhostComponent = ghost => ({
   ...ghost,
-  component: cloneElement(ghost.source.item.element, {
+  kernel: cloneElement(ghost.source.item.element, {
     draggableItem: { id: ghost.id, className: ghost.className }
   })
 });
@@ -49,7 +61,7 @@ const setGhostPos = cursor => ghost => ({
   ...ghost,
   pos: calcGhostPos(cursor)
 });
-const setIsActive = cursor => ghost => ({ ...ghost, isActive: true });
+const setIsActive = ghost => ({ ...ghost, isActive: true });
 
 const setGhost = cursor =>
   pipe(
@@ -64,12 +76,25 @@ const setGhost = cursor =>
     setGhostClassName,
     setGhostComponent,
     setGhostPos(cursor),
-    setIsActive
+    setIsActive,
+    log("setGhost")
   );
 
-export const drag = ({ state, cursor, item }) => {
+export const start = ({
+  state,
+  cursor,
+  item,
+  transitionParams,
+  onTransitionEnd
+}) => {
   const ghost = setGhost(cursor)(item);
-  return { ...state, ...ghost };
+  return {
+    ...state,
+    ...ghost,
+    transDur: transitionParams.ghostTransitionDuration,
+    transTFunc: transitionParams.ghostTransitionTimingFunction,
+    onTransitionEnd
+  };
 };
 
 export const move = ({ state, cursor }) => ({

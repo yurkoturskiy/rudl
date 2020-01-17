@@ -1,13 +1,15 @@
 import React, { useReducer, useEffect, useCallback } from "react";
-import { initState, drag, move } from "./reducerEventsHandlers";
+import { initState, start, move, drop, end } from "./reducerEventsHandlers";
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case "DRAG":
-      return drag({
+    case "START": // On cursor drag
+      return start({
         state,
         cursor: action.payload.cursor,
-        item: action.payload.item
+        item: action.payload.item,
+        transitionParams: action.payload.transitionParams,
+        onTransitionEnd: action.payload.onTransitionEnd
       });
     case "MOVE":
       return move({ state, cursor: action.payload.cursor });
@@ -37,10 +39,27 @@ function useGhost(cursor, items, transitionParams) {
   const onTransitionEnd = useCallback(setAction("END"), []);
 
   useEffect(() => {
-    cursor.isDrag && onDrag({ cursor, item: items[cursor.item.index] });
     cursor.isDrag && cursor.isMove && onMove({ cursor });
     !cursor.isDrag && onDrop();
-  }, [cursor, cursor.isDrag, items, onDrag, onDrop, onMove]);
+    // Start on cursor drag
+    cursor.isDrag &&
+      !state.isActive &&
+      onStart({
+        cursor,
+        item: items[cursor.item.index],
+        transitionParams,
+        onTransitionEnd
+      });
+  }, [
+    cursor,
+    state,
+    items,
+    onStart,
+    onDrop,
+    onMove,
+    onTransitionEnd,
+    transitionParams
+  ]);
 
   return ghost;
 }
