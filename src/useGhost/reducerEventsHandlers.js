@@ -9,6 +9,10 @@ export const initState = ({ state } = {}) => ({
   className: null,
   component: null
 });
+const calcGhostPos = cursor => ({
+  x: cursor.pos.x - cursor.dragPoint.x,
+  y: cursor.pos.y - cursor.dragPoint.y
+});
 
 const setSourceItem = item => ({ item });
 const setSourceId = source => ({ ...source, id: source.item.id });
@@ -42,10 +46,7 @@ const setGhostComponent = ghost => ({
 });
 const setGhostPos = cursor => ghost => ({
   ...ghost,
-  pos: {
-    x: cursor.pos.x - cursor.dragPoint.x,
-    y: cursor.pos.y - cursor.dragPoint.y
-  }
+  pos: calcGhostPos(cursor)
 });
 
 const setGhost = cursor =>
@@ -67,3 +68,8 @@ export const drag = ({ state, cursor, item }) => {
   const ghost = setGhost(cursor)(item);
   return { ...state, ...ghost };
 };
+
+export const move = ({ state, cursor }) => ({
+  ...state,
+  pos: calcGhostPos(cursor)
+});

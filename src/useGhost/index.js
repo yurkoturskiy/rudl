@@ -1,12 +1,16 @@
 import React, { useReducer, useEffect, useCallback } from "react";
-import { initState, drag } from "./reducerEventsHandlers";
+import { initState, drag, move } from "./reducerEventsHandlers";
 
 const reducer = (state, action) => {
   switch (action.type) {
     case "DRAG":
-      return drag({ state, ...action.payload });
+      return drag({
+        state,
+        cursor: action.payload.cursor,
+        item: action.payload.item
+      });
     case "MOVE":
-      break;
+      return move({ state, cursor: action.payload.cursor });
     case "DROP":
       break;
     case "TRANSITION_END":
