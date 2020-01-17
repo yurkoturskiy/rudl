@@ -2,39 +2,41 @@ import React from "react";
 import PropTypes from "prop-types";
 
 const Ghost = ({
-  x,
-  y,
-  drag,
-  component,
-  ghostTransitionDuration,
-  ghostTransitionTimingFunction,
-  onGhostEndTransition
-}) => (
-  <div
-    style={{
-      position: "fixed",
-      visibility: "visible",
-      left: x,
-      top: y,
-      pointerEvents: "none",
-      transition: drag
-        ? "none"
-        : `left ${ghostTransitionDuration}ms ${ghostTransitionTimingFunction}, top ${ghostTransitionDuration}ms ${ghostTransitionTimingFunction}`
-    }}
-    onTransitionEnd={() => onGhostEndTransition()}
-  >
-    {component}
-  </div>
-);
+  pos,
+  isTransit,
+  kernel,
+  transDur,
+  transTFunc,
+  onTransitionEnd
+}) => {
+  const transition = isTransit
+    ? `left ${transDur}ms ${transTFunc}, top ${transDur}ms ${transTFunc}`
+    : "none";
+  return (
+    <div
+      style={{
+        position: "fixed",
+        visibility: "visible",
+        left: pos.x,
+        top: pos.y,
+        pointerEvents: "none",
+        transition
+      }}
+      onTransitionEnd={onTransitionEnd}
+    >
+      {kernel}
+    </div>
+  );
+};
 
 Ghost.propTypes = {
-  x: PropTypes.number,
+  pos: PropTypes.object,
   y: PropTypes.number,
-  drag: PropTypes.bool,
-  ghostTransitionDuration: PropTypes.number,
-  ghostTransitionTimingFunction: PropTypes.string,
-  onGhostEndTransition: PropTypes.func,
-  component: PropTypes.element
+  isTransit: PropTypes.bool,
+  transDur: PropTypes.number,
+  transTFunc: PropTypes.string,
+  onTransitionEnd: PropTypes.func,
+  kernel: PropTypes.element
 };
 
 export default Ghost;

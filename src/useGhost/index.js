@@ -1,5 +1,6 @@
 import React, { useReducer, useEffect, useCallback } from "react";
 import { initState, start, move, drop, end } from "./reducerEventsHandlers";
+import Ghost from "../components/Ghost";
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -63,7 +64,8 @@ function useGhost(cursor, items, transitionParams) {
     transitionParams
   ]);
 
-  return ghost;
+  const component = state.isActive && <Ghost {...state} />;
+  return { ...state, component };
 }
 
 export default useGhost;

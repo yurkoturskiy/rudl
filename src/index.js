@@ -439,17 +439,7 @@ function DraggableMasonryLayout(props) {
         layoutIsMount={layoutIsMount}
       >
         {renderItems}
-        {ghost && (
-          <Ghost
-            x={ghostPos.x}
-            y={ghostPos.y}
-            drag={drag}
-            component={ghost}
-            onGhostEndTransition={onGhostEndTransition}
-            ghostTransitionDuration={ghostTransitionDuration}
-            ghostTransitionTimingFunction={ghostTransitionTimingFunction}
-          />
-        )}
+        {newGhost.isActive && newGhost.component}
         {typeof layout.endline.start.y === "number" && (
           <Endline
             startRef={endlineStartRef}
