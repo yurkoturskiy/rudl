@@ -3,6 +3,7 @@ import { cloneElement } from "react";
 
 export const initState = ({ state } = {}) => ({
   ...state,
+  isActive: false,
   id: null,
   pos: null,
   source: null,
@@ -48,6 +49,7 @@ const setGhostPos = cursor => ghost => ({
   ...ghost,
   pos: calcGhostPos(cursor)
 });
+const setIsActive = cursor => ghost => ({ ...ghost, isActive: true });
 
 const setGhost = cursor =>
   pipe(
@@ -61,7 +63,8 @@ const setGhost = cursor =>
     setGhostId,
     setGhostClassName,
     setGhostComponent,
-    setGhostPos(cursor)
+    setGhostPos(cursor),
+    setIsActive
   );
 
 export const drag = ({ state, cursor, item }) => {
