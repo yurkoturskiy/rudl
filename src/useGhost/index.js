@@ -11,7 +11,7 @@ const reducer = (state, action) => {
         transitionParams: action.payload.transitionParams,
         onTransitionEnd: action.payload.onTransitionEnd
       });
-    case "MOVE":
+    case "MOVE": // On cursor move
       return move({ state, cursor: action.payload.cursor });
     case "DROP":
       break;
@@ -50,6 +50,8 @@ function useGhost(cursor, items, transitionParams) {
         transitionParams,
         onTransitionEnd
       });
+    // Move on cursor move
+    cursor.isDrag && cursor.isMove && cursor.pos && onMove({ cursor });
   }, [
     cursor,
     state,

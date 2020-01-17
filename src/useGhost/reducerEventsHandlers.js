@@ -97,7 +97,10 @@ export const start = ({
   };
 };
 
+const calcMovePos = pipe(calcGhostPos, log("calcMovePos"));
+
 export const move = ({ state, cursor }) => ({
   ...state,
-  pos: calcGhostPos(cursor)
+  pos: calcMovePos(cursor)
+});
 });
