@@ -13,10 +13,10 @@ const reducer = (state, action) => {
       });
     case "MOVE": // On cursor move
       return move({ state, cursor: action.payload.cursor });
-    case "DROP":
-      break;
     case "TRANSITION_END":
       break;
+    case "DROP": // On cursor end drag
+      return drop({ state });
     default:
       return state;
   }
@@ -39,8 +39,6 @@ function useGhost(cursor, items, transitionParams) {
   const onTransitionEnd = useCallback(setAction("END"), []);
 
   useEffect(() => {
-    cursor.isDrag && cursor.isMove && onMove({ cursor });
-    !cursor.isDrag && onDrop();
     // Start on cursor drag
     cursor.isDrag &&
       !state.isActive &&
@@ -52,6 +50,8 @@ function useGhost(cursor, items, transitionParams) {
       });
     // Move on cursor move
     cursor.isDrag && cursor.isMove && cursor.pos && onMove({ cursor });
+    // Drop on cursor up
+    state.isActive && !cursor.isDrag && !state.isDrop && onDrop();
   }, [
     cursor,
     state,

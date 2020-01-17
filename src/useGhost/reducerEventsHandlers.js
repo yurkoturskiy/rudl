@@ -103,4 +103,24 @@ export const move = ({ state, cursor }) => ({
   ...state,
   pos: calcMovePos(cursor)
 });
+
+/* Drop */
+const setWrapperId = sourceId => `${sourceId}-wrapper`;
+const getElementById = id => document.getElementById(id);
+const getRectFromElement = element => element.getBoundingClientRect();
+const getPosFromRect = rect => ({ x: rect.left, y: rect.top });
+const getWrapperFixedPosFromSourceId = pipe(
+  setWrapperId,
+  getElementById,
+  getRectFromElement,
+  getPosFromRect,
+  log("getWrapperFixedPosFromSourceId")
+);
+
+export const drop = ({ state }) => ({
+  ...state,
+  isDrop: true,
+  isTransit: true,
+  pos: getWrapperFixedPosFromSourceId(state.source.id),
+  transitionTimeout: setTimeout(state.onTransitionEnd, state.transDur + 100)
 });
