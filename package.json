@@ -39,6 +39,7 @@
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
+    "loglevel": "^1.6.6",
     "prop-types": "^15.7.2",
     "ramda": "^0.26.1",
     "react": "^16.12.0"
