@@ -31,13 +31,13 @@ const payloadDispatcher = dispatch => type => payload =>
 function useGhost(cursor, items, transitionParams) {
   const [state, dispatch] = useReducer(reducer, {}, initState);
   // (payload) => setAction("SOME_ACTION")
-  const setAction = useCallback(payloadDispatcher(dispatch), []);
+  const createAction = useCallback(payloadDispatcher(dispatch), []);
   // Actions
-  const onStart = useCallback(setAction("START"), []);
-  const onMove = useCallback(setAction("MOVE"), []);
-  const onDrop = useCallback(setAction("DROP"), []);
+  const onStart = useCallback(createAction("START"), []);
+  const onMove = useCallback(createAction("MOVE"), []);
+  const onDrop = useCallback(createAction("DROP"), []);
   // Ghost component action
-  const onTransitionEnd = useCallback(setAction("END"), []);
+  const onTransitionEnd = useCallback(createAction("END"), []);
 
   useEffect(() => {
     // Start on cursor drag
