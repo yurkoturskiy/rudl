@@ -24,14 +24,14 @@ const reducer = (state, action) => {
 };
 
 // Reducer's action factory
-const payloadDispatcher = dispatch => type => payload =>
+const createDispatcher = dispatch => type => payload =>
   dispatch({ type, payload });
 
 // Hook
 function useGhost(cursor, items, transitionParams) {
   const [state, dispatch] = useReducer(reducer, {}, initState);
   // (payload) => setAction("SOME_ACTION")
-  const createAction = useCallback(payloadDispatcher(dispatch), []);
+  const createAction = useCallback(createDispatcher(dispatch), []);
   // Actions
   const onStart = useCallback(createAction("START"), []);
   const onMove = useCallback(createAction("MOVE"), []);
