@@ -16,6 +16,10 @@ import Ghost from "./components/Ghost";
 import Endline from "./components/Endline";
 import Header from "./components/Header";
 import ItemComponent from "./components/ItemComponent";
+// import * as log from "loglevel";
+var log = require("loglevel");
+log.setLevel("warn");
+log.getLogger("ghost").setLevel("trace");
 
 //////////////////////////////
 /* Masonry layout component */
