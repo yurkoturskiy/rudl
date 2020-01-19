@@ -35,6 +35,11 @@ function DraggableMasonryLayout(props) {
     children
   } = props;
 
+  // Refs
+  const masonryLayoutRef = useRef(); // Top wrapper
+  const endlineStartRef = useRef(); // Endline start sensor
+  const endlineEndRef = useRef(); // Endline end sensor
+
   const [cursor, getDraggableItemEvents] = useCursor();
   const [items, reorder] = useItems({
     children,
@@ -175,10 +180,6 @@ function DraggableMasonryLayout(props) {
   });
   const [onErrorCount, setOnErrorCount] = useState(0);
   const [onLoadCount, setOnLoadCount] = useState(0);
-
-  const masonryLayoutRef = useRef(); // Top wrapper
-  const endlineStartRef = useRef(); // Endline start sensor
-  const endlineEndRef = useRef(); // Endline end sensor
 
   ////////////
   // Resize //
