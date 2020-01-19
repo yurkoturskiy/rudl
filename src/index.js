@@ -176,7 +176,7 @@ function DraggableMasonryLayout(props) {
   const [onErrorCount, setOnErrorCount] = useState(0);
   const [onLoadCount, setOnLoadCount] = useState(0);
 
-  const masonryLayout = useRef(); // Top wrapper
+  const masonryLayoutRef = useRef(); // Top wrapper
   const endlineStartRef = useRef(); // Endline start sensor
   const endlineEndRef = useRef(); // Endline end sensor
 
@@ -204,7 +204,7 @@ function DraggableMasonryLayout(props) {
       setWinWidth(window.innerWidth);
     }
     // Check layout
-    const wrapperWidth = masonryLayout.current.offsetWidth;
+    const wrapperWidth = masonryLayoutRef.current.offsetWidth;
     const cardRefItem = items.find(item => !item.isSeparator);
     const cardWrapperWidth =
       items[0].width ||
@@ -240,7 +240,7 @@ function DraggableMasonryLayout(props) {
 
   useEffect(() => {
     // component did mount or update
-    if (masonryLayout.current.offsetHeight > 0) {
+    if (masonryLayoutRef.current.offsetHeight > 0) {
       // if layout rendered
       setLayoutIsMount(true);
       checkEndlineEnterEvent();
@@ -357,7 +357,7 @@ function DraggableMasonryLayout(props) {
   );
 
   return (
-    <div className="masonry" ref={masonryLayout}>
+    <div className="masonry" ref={masonryLayoutRef}>
       {props.header && layoutIsMount && (
         <Header width={layout.width} component={props.header} />
       )}
