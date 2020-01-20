@@ -10,19 +10,21 @@ import PropTypes from "prop-types";
 import useCursor from "./useCursor/index";
 import useItems from "./useItems/index";
 import useGhost from "./useGhost/index";
+import useBody from "./useBody";
 // Components
 import BoundryBox from "./components/BoundryBox";
 import Ghost from "./components/Ghost";
 import Endline from "./components/Endline";
 import Header from "./components/Header";
 import ItemComponent from "./components/ItemComponent";
-// import * as log from "loglevel";
+// Loglevel setup
 var log = require("loglevel");
 log.setLevel("warn");
 log.getLogger("useGhost").setLevel("trace");
 log.getLogger("useCursor").setLevel("trace");
 log.getLogger("useGrid").setLevel("warn");
 log.getLogger("useItems").setLevel("trace");
+log.getLogger("useBody").setLevel("warn");
 
 //////////////////////////////
 /* Masonry layout component */
@@ -56,6 +58,7 @@ function DraggableMasonryLayout(props) {
     ghostTransitionDuration
   });
 
+  const body = useBody(cursor);
   const [overItemIndex, setOverItemIndex] = useState(); // cursor instance
   const [dragItemPrevOrder, setDragItemPrevOrder] = useState(); // items instance
   const [dragItemNewOrder, setDragItemNewOrder] = useState(); // items instance
