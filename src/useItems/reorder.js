@@ -1,36 +1,77 @@
 import { pipe, map } from "ramda";
+import logger from "../utils/logger";
+const { trace } = logger("useItems");
 
-const assignNewOrder = ({ dragItemOrder = 1, overItemOrder = 0 }) => item => {
+const assignNewOrder = ([
+  dragItemPrevOrder = 1,
+  dragItemNewOrder = 0
+]) => item => {
   let { order } = item; // Item is out of range. Keep same order
 
   // Override for items need to be changed
-  if (dragItemOrder < overItemOrder) {
+  if (dragItemPrevOrder < dragItemNewOrder) {
     // Drag toward the end
-    if (order > dragItemOrder && order <= overItemOrder)
+    if (order > dragItemPrevOrder && order <= dragItemNewOrder)
       // Inbetween notes. Replace on one to the start
       order -= 1;
-    else if (order === dragItemOrder)
+    else if (order === dragItemPrevOrder)
       // Assign new order to the draggable
-      order = overItemOrder;
-  } else if (dragItemOrder > overItemOrder) {
+      order = dragItemNewOrder;
+  } else if (dragItemPrevOrder > dragItemNewOrder) {
     // Drag toward the start
-    if (order < dragItemOrder && order >= overItemOrder)
+    if (order < dragItemPrevOrder && order >= dragItemNewOrder)
       // Inbetween notes. Replace on one to the end
       order += 1;
-    else if (order === dragItemOrder)
+    else if (order === dragItemPrevOrder)
       // Assign new order to the draggable
-      order = overItemOrder;
+      order = dragItemNewOrder;
   }
   return { ...item, order };
 };
 
-const mapArgs = ({ state, dragItemIndex = 1, overItemIndex = 0 }) => ({
-  items: state,
-  dragItemOrder: state[dragItemIndex].order,
-  overItemOrder: state[overItemIndex].order
+const findItemById = (items, id) => items.find(item => item.id === id);
+
+// Validate if index is presented. In case of touch interfaces it is not
+const validateItemsParams = ({ state, dragItem, overItem }) => ({
+  ...state,
+  dragItem: {
+    id: dragItem.id,
+    index: dragItem.index || findItemById(state.list, dragItem.id).index
+  },
+  overItem: {
+    id: overItem.id,
+    index: overItem.index || findItemById(state.list, overItem.id).index
+  }
 });
 
-const mapItems = fn => ({ items, dragItemOrder, overItemOrder }) =>
-  map(fn({ dragItemOrder, overItemOrder }), items);
+const updateDragItemOrders = state => ({
+  ...state,
+  dragItemPrevOrder: state.list[state.dragItem.index].order,
+  dragItemNewOrder: state.list[state.overItem.index].order
+});
 
-export default pipe(mapArgs, mapItems(assignNewOrder));
+const rearrangeItems = fn => state => ({
+  ...state,
+  isRearranges: true,
+  list: map(fn([state.dragItemPrevOrder, state.dragItemNewOrder]), state.list)
+});
+
+const onRearrange = state => {
+  state.onRearrange(state);
+  return {
+    ...state,
+    dragItemPrevOrder: null,
+    dragItemNewOrder: null
+  };
+};
+
+export default pipe(
+  validateItemsParams,
+  trace("validate items"),
+  updateDragItemOrders,
+  trace("update drag item orders"),
+  rearrangeItems(assignNewOrder),
+  trace("rearrange items"),
+  onRearrange,
+  trace("on rearrange")
+);

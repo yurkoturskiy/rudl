@@ -35,9 +35,9 @@ function DraggableMasonryLayout(props) {
     transitionDuration,
     ghostTransitionDuration,
     ghostTransitionTimingFunction,
-    children
+    children,
+    onRearrange
   } = props;
-
   // Refs
   const masonryLayoutRef = useRef(); // Top wrapper
   const endlineStartRef = useRef(); // Endline start sensor
@@ -47,7 +47,9 @@ function DraggableMasonryLayout(props) {
   const [items, reorder] = useItems({
     children,
     getDraggableItemEvents,
-    cursor
+    cursor,
+    transitionDuration,
+    onRearrange
   });
   const newGhost = useGhost(cursor, items, {
     ghostTransitionTimingFunction,
