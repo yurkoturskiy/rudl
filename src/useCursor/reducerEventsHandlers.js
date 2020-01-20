@@ -7,8 +7,8 @@ const distanceIsMT2 = (pos, initialPos) =>
   deltaMT2(pos.x, initialPos.x) || deltaMT2(pos.y, initialPos.y);
 
 // Initial Cursor Point
-const getRectFromItemId = item => () =>
-  document.getElementById(`${item.id}-wrapper`).getBoundingClientRect();
+const getRectFromItemId = dragItemId => () =>
+  document.getElementById(`${dragItemId}-wrapper`).getBoundingClientRect();
 const calcItemInitPointFromPos = pos => rect => ({
   x: pos.x - rect.left,
   y: pos.y - rect.top
@@ -18,11 +18,11 @@ const roundPos = pos => ({
   y: Math.round(pos.y)
 });
 
-const calcItemInitPoint = (pos, item) =>
-  pipe(getRectFromItemId(item), calcItemInitPointFromPos(pos), roundPos);
+const calcItemInitPoint = (pos, dragItemId) =>
+  pipe(getRectFromItemId(dragItemId), calcItemInitPointFromPos(pos), roundPos);
 
-const tryCalcItemInitPoint = (pos, item) =>
-  tryCatch(calcItemInitPoint(pos, item), errorHandler)();
+const tryCalcItemInitPoint = (pos, dragItemId) =>
+  tryCatch(calcItemInitPoint(pos, dragItemId), errorHandler)();
 
 const getElementIdFromPoint = pos => document.elementFromPoint(pos.x, pos.y).id;
 const getIdFromPos = pos => tryCatch(getElementIdFromPoint, errorHandler)(pos);
@@ -39,9 +39,11 @@ export const initState = ({ state } = {}) => ({
   initialPos: null,
   numOfCursors: null,
   // Item scope
-  item: null,
+  dragItemId: null,
+  dragItemIndex: null,
   dragPoint: null,
-  overItem: null
+  overItemId: null,
+  overItemIndex: null
 });
 
 // Mouse events handlers
@@ -53,7 +55,8 @@ export const mouseMove = ({ state, event }) => {
   const isMove = state.isMove || distanceIsMT2(pos, state.initialPos);
   const isDrag = state.isDrag || isMove;
   const preventClick = state.preventClick || isDrag;
-  return { ...state, pos, isMove, isDrag, preventClick };
+  const overItemId = getIdFromPos(pos);
+  return { ...state, pos, isMove, isDrag, preventClick, overItemId };
 };
 
 export const mouseDown = ({ state, event, item }) => {
@@ -63,16 +66,18 @@ export const mouseDown = ({ state, event, item }) => {
     ...state,
     isMouse: true,
     initialPos: pos,
-    item,
+    dragItemId: item.id,
+    dragItemIndex: item.index,
     pos,
-    dragPoint: tryCalcItemInitPoint(pos, item)
+    dragPoint: tryCalcItemInitPoint(pos, item.id)
   };
 };
 
-export const mouseEnter = ({ state, event, item }) => ({
-  ...state,
-  overItem: item
-});
+// export const mouseEnter = ({ state, event, item }) => ({
+//   ...state,
+//   overItemId: item.id,
+//   overItemIndex: item.index
+// });
 
 export const clickCapture = ({ state, event }) => {
   // Prevent onClick event when dragging
@@ -98,7 +103,8 @@ export const touchStart = ({ state, event, item }) => {
     isTouch: true,
     initialPos: pos,
     numOfCursors,
-    item,
+    dragItemId: item.id,
+    dragItemIndex: item.index,
     pos
   };
 };
@@ -111,8 +117,8 @@ export const touchMove = ({ state, event, item }) => {
     y: event.touches[0].clientY
   };
   const isMove = state.isMove || distanceIsMT2(pos, state.initialPos);
-  const overItem = { id: getIdFromPos(pos) };
-  return { ...state, pos, isMove, overItem };
+  const overItemId = getIdFromPos(pos);
+  return { ...state, pos, isMove, overItemId };
 };
 
 // Gestures
@@ -124,5 +130,5 @@ export const longPress = ({ state }) => ({
   ...state,
   isLongPress: !state.isMove,
   isDrag: !state.isMove,
-  dragPoint: tryCalcItemInitPoint(state.initialPos, state.item)
+  dragPoint: tryCalcItemInitPoint(state.initialPos, state.dragItemId)
 });

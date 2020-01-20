@@ -10,12 +10,22 @@ import PropTypes from "prop-types";
 import useCursor from "./useCursor/index";
 import useItems from "./useItems/index";
 import useGhost from "./useGhost/index";
+import useGrid from "./useGrid/index";
+import useBody from "./useBody";
 // Components
 import BoundryBox from "./components/BoundryBox";
 import Ghost from "./components/Ghost";
 import Endline from "./components/Endline";
 import Header from "./components/Header";
 import ItemComponent from "./components/ItemComponent";
+// Loglevel setup
+var log = require("loglevel");
+log.setLevel("warn");
+log.getLogger("useGhost").setLevel("warn");
+log.getLogger("useCursor").setLevel("warn");
+log.getLogger("useGrid").setLevel("warn");
+log.getLogger("useItems").setLevel("warn");
+log.getLogger("useBody").setLevel("warn");
 
 //////////////////////////////
 /* Masonry layout component */
@@ -28,126 +38,33 @@ function DraggableMasonryLayout(props) {
     transitionDuration,
     ghostTransitionDuration,
     ghostTransitionTimingFunction,
-    children
+    children,
+    onRearrange
   } = props;
+  // Refs
+  const masonryLayoutRef = useRef(); // Top wrapper
+  const endlineStartRef = useRef(); // Endline start sensor
+  const endlineEndRef = useRef(); // Endline end sensor
 
   const [cursor, getDraggableItemEvents] = useCursor();
   const [items, reorder] = useItems({
     children,
     getDraggableItemEvents,
-    cursor
+    cursor,
+    transitionDuration,
+    onRearrange
   });
   const newGhost = useGhost(cursor, items, {
     ghostTransitionTimingFunction,
     ghostTransitionDuration
   });
 
-  const [overItemIndex, setOverItemIndex] = useState(); // cursor instance
-  const [dragItemPrevOrder, setDragItemPrevOrder] = useState(); // items instance
-  const [dragItemNewOrder, setDragItemNewOrder] = useState(); // items instance
-  const [isRearranges, setIsRearranges] = useState(false); // items instance
-  // Touch events
-  const [touch, setTouch] = useState(false);
-  // Mouse
-  const [mouse, setMouse] = useState();
-  // Drag events
-  const [drag, setDrag] = useState(false);
-  const [dragItemIndex, setDragItemIndex] = useState();
-  const [dragPoint, setDragPoint] = useState();
+  const body = useBody(cursor);
+
+  // useGrid(items, masonryLayoutRef);
+
   // Ghost
   const [ghost, setGhost] = useState();
-  // Body
-  const [bodyDefaultOverflow, setBodyDefaultOverflow] = useState();
-  const [
-    bodyDefaultOverscrollBehaviorY,
-    setBodyDefaultOverscrollBehaviorY
-  ] = useState();
-
-  /////////////////////
-  /* Events' methods */
-  /////////////////////
-
-  useEffect(() => {
-    // Reorder effect
-    if (
-      typeof dragItemIndex === "number" &&
-      typeof overItemIndex === "number" &&
-      overItemIndex !== dragItemIndex &&
-      !isRearranges
-    ) {
-      setDragItemNewOrder(items[overItemIndex].order);
-      setIsRearranges(true);
-      setTimeout(() => {
-        // console.log("rearrange is done");
-        setIsRearranges(false);
-      }, 500);
-      reorder({ overItemIndex, dragItemIndex });
-    }
-  }, [overItemIndex, dragItemIndex, items, isRearranges, reorder]);
-
-  useEffect(() => {
-    if (!touch && !ghost) {
-      document.body.style.overflow = bodyDefaultOverflow;
-      document.body.style.overscrollBehaviorY = bodyDefaultOverscrollBehaviorY;
-    }
-  }, [touch, ghost, bodyDefaultOverflow, bodyDefaultOverscrollBehaviorY]);
-
-  //////////////////////////
-  /* Touch screens events */
-  //////////////////////////
-
-  useEffect(() => {
-    setBodyDefaultOverflow(document.body.style.overflow);
-    setBodyDefaultOverscrollBehaviorY(document.body.style.overscrollBehaviorY);
-  }, []);
-
-  //////////////////
-  /* Mouse events */
-  //////////////////
-
-  useEffect(() => {
-    if (
-      typeof dragItemPrevOrder === "number" &&
-      typeof dragItemNewOrder === "number" &&
-      dragItemNewOrder !== dragItemPrevOrder &&
-      !drag
-    ) {
-      // console.log("call on rearrange func");
-      props.onRearrange &&
-        props.onRearrange(items[dragItemIndex], dragItemNewOrder, items);
-      setDragItemPrevOrder(null);
-      setDragItemNewOrder(null);
-    }
-  }, [dragItemNewOrder, dragItemIndex, items, dragItemPrevOrder, props, drag]);
-
-  useEffect(() => {
-    // Set drag
-    if (mouse && mouse.isDown && mouse.pos && !drag) {
-      // For mouse interface
-      if (
-        Math.abs(mouse.pos.x - mouse.initialPos.x) >= 3 ||
-        Math.abs(mouse.pos.y - mouse.initialPos.y) >= 3
-      ) {
-        setDrag(true);
-        setDragItemPrevOrder(items[mouse.itemIndex].order);
-        setDragItemIndex(mouse.itemIndex);
-      }
-    }
-    if (touch && !drag) {
-      // For touch interface
-      press = setTimeout(() => {
-        // Temporary disable scroll and pull-down-to-refresh
-        document.body.style.overflow = "hidden";
-        document.body.style.overscrollBehaviorY = "contain";
-      }, 300);
-      longPress = // Long press event
-        touch.numOfFingers === 1 &&
-        setTimeout(() => {
-          setDragItemIndex(touch.itemIndex);
-          setDrag(true);
-        }, 500);
-    }
-  }, [touch, mouse, drag, items]);
 
   ////////////////////
   /* Masonry Layout */
@@ -171,10 +88,6 @@ function DraggableMasonryLayout(props) {
   });
   const [onErrorCount, setOnErrorCount] = useState(0);
   const [onLoadCount, setOnLoadCount] = useState(0);
-
-  const masonryLayout = useRef(); // Top wrapper
-  const endlineStartRef = useRef(); // Endline start sensor
-  const endlineEndRef = useRef(); // Endline end sensor
 
   ////////////
   // Resize //
@@ -200,7 +113,7 @@ function DraggableMasonryLayout(props) {
       setWinWidth(window.innerWidth);
     }
     // Check layout
-    const wrapperWidth = masonryLayout.current.offsetWidth;
+    const wrapperWidth = masonryLayoutRef.current.offsetWidth;
     const cardRefItem = items.find(item => !item.isSeparator);
     const cardWrapperWidth =
       items[0].width ||
@@ -236,7 +149,7 @@ function DraggableMasonryLayout(props) {
 
   useEffect(() => {
     // component did mount or update
-    if (masonryLayout.current.offsetHeight > 0) {
+    if (masonryLayoutRef.current.offsetHeight > 0) {
       // if layout rendered
       setLayoutIsMount(true);
       checkEndlineEnterEvent();
@@ -353,7 +266,7 @@ function DraggableMasonryLayout(props) {
   );
 
   return (
-    <div className="masonry" ref={masonryLayout}>
+    <div className="masonry" ref={masonryLayoutRef}>
       {props.header && layoutIsMount && (
         <Header width={layout.width} component={props.header} />
       )}

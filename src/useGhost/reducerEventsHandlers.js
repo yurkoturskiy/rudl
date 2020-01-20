@@ -1,5 +1,11 @@
 import { pipe } from "ramda";
 import { cloneElement } from "react";
+var useGhostLoglevel = require("loglevel").getLogger("ghost");
+
+const log = (...labels) => value => {
+  useGhostLoglevel.debug("useGhost debug:", ...labels, value);
+  return value;
+};
 
 export const initState = ({ state } = {}) => ({
   ...state,
@@ -16,11 +22,6 @@ export const initState = ({ state } = {}) => ({
   onTransitionEnd: null,
   transitionTimeout: null
 });
-
-const log = label => value => {
-  console.log(label, value);
-  return value;
-};
 
 const calcGhostPos = cursor => ({
   x: cursor.pos.x - cursor.dragPoint.x,
@@ -129,7 +130,7 @@ const resetSourceClassList = source =>
   source.element.classList.remove("ghost", "touch");
 
 export const end = ({ state }) => {
-  console.log("end");
+  log("end")();
   resetSourceClassList(state.source);
   clearTimeout(state.transitionTimeout);
   return initState({ state });

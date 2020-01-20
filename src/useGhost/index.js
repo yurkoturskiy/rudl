@@ -1,8 +1,12 @@
 import React, { useReducer, useEffect, useCallback } from "react";
 import { initState, start, move, drop, end } from "./reducerEventsHandlers";
 import Ghost from "../components/Ghost";
+import logger from "../utils/logger";
+
+const { log } = logger("useGhost");
 
 const reducer = (state, action) => {
+  log.debug("useGhost reducer", action.type, state, action.payload);
   switch (action.type) {
     case "START": // On cursor drag
       return start({
@@ -24,45 +28,52 @@ const reducer = (state, action) => {
 };
 
 // Reducer's action factory
-const payloadDispatcher = dispatch => type => payload =>
+const createDispatcher = dispatch => type => payload =>
   dispatch({ type, payload });
 
 // Hook
 function useGhost(cursor, items, transitionParams) {
   const [state, dispatch] = useReducer(reducer, {}, initState);
   // (payload) => setAction("SOME_ACTION")
-  const setAction = useCallback(payloadDispatcher(dispatch), []);
+  const createAction = useCallback(createDispatcher(dispatch), []);
   // Actions
-  const onStart = useCallback(setAction("START"), []);
-  const onMove = useCallback(setAction("MOVE"), []);
-  const onDrop = useCallback(setAction("DROP"), []);
+  const onStart = useCallback(createAction("START"), []);
+  const onMove = useCallback(createAction("MOVE"), []);
+  const onDrop = useCallback(createAction("DROP"), []);
   // Ghost component action
-  const onTransitionEnd = useCallback(setAction("END"), []);
+  const onTransitionEnd = useCallback(createAction("END"), []);
 
+  // Start on cursor drag
   useEffect(() => {
-    // Start on cursor drag
     cursor.isDrag &&
       !state.isActive &&
       onStart({
         cursor,
-        item: items[cursor.item.index],
+        item: items[cursor.dragItemIndex],
         transitionParams,
         onTransitionEnd
       });
-    // Move on cursor move
-    cursor.isDrag && cursor.isMove && cursor.pos && onMove({ cursor });
-    // Drop on cursor up
-    state.isActive && !cursor.isDrag && !state.isDrop && onDrop();
   }, [
     cursor,
-    state,
     items,
     onStart,
-    onDrop,
-    onMove,
     onTransitionEnd,
+    state.isActive,
     transitionParams
   ]);
+
+  // Move on cursor move
+  useEffect(() => {
+    cursor.isDrag && cursor.isMove && cursor.pos && onMove({ cursor });
+  }, [cursor, onMove]);
+
+  // Drop on cursor up
+  useEffect(() => {
+    state.isActive && !cursor.isDrag && !state.isDrop && onDrop();
+  }, [cursor.isDrag, onDrop, state.isActive, state.isDrop]);
+
+  // Log effect
+  useEffect(() => log.debug("useGhost state update", state), [state]);
 
   const component = state.isActive && <Ghost {...state} />;
   return { ...state, component };

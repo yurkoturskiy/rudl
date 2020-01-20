@@ -32,9 +32,16 @@ const initItem = getDraggableItemEvents => (child, index) =>
 const getListOfItems = ({ children, getDraggableItemEvents }) =>
   React.Children.map(children, initItem(getDraggableItemEvents));
 
-export default ({ children, getDraggableItemEvents }) => ({
-  draggablePrevOrder: null,
-  draggableNewOrder: null,
+export default ({ state, children, getDraggableItemEvents, ...initArgs }) => ({
+  ...state,
+  ...initArgs,
+  dragItemId: null,
+  dragItemIndex: null,
+  overItemId: null,
+  overItemIndex: null,
+  dragItemPrevOrder: null,
+  dragItemNewOrder: null,
   isRearranges: false,
+  setOverItem: null,
   list: getListOfItems({ children, getDraggableItemEvents })
 });

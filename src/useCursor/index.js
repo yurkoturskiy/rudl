@@ -1,4 +1,5 @@
 import React, { useReducer, useEffect, useCallback } from "react";
+import logger from "../utils/logger";
 // Event handlers
 import {
   initState,
@@ -18,13 +19,16 @@ import {
 import usePress from "./usePress";
 import useDocumentEvents from "./useDocumentEvents";
 
+const { log } = logger("useCursor");
+
 const reducer = (state, action) => {
+  log.debug("useCursor reducer", action.type, state, action.payload);
   switch (action.type) {
     // Mouse
     case "MOUSE_MOVE":
       return mouseMove({ state, ...action.payload });
-    case "MOUSE_ENTER":
-      return mouseEnter({ state, ...action.payload });
+    // case "MOUSE_ENTER":
+    //   return state.isDrag ? mouseEnter({ state, ...action.payload }) : state;
     case "MOUSE_DOWN":
       return mouseDown({ state, ...action.payload });
     case "MOUSE_UP":
@@ -45,13 +49,23 @@ const reducer = (state, action) => {
       return press({ state });
     case "LONG_PRESS":
       return longPress({ state });
+    // Methods
+    case "SET_METHODS":
+      return { ...state, ...action.payload };
+    case "SET_OVER_ITEM":
+      return {
+        ...state,
+        overItemIndex: action.payload,
+        overItemId: action.payload
+      };
     default:
       return state;
   }
 };
 
 // Reducer's action factories
-const plainDispatcher = dispatch => type => () => dispatch({ type });
+const createDispatcher = dispatch => type => payload =>
+  dispatch({ type, payload });
 const eventDispatcher = dispatch => type => event =>
   dispatch({ type, payload: { event } });
 const itemEventDispatcher = dispatch => type => item => event =>
@@ -59,10 +73,10 @@ const itemEventDispatcher = dispatch => type => item => event =>
 
 // Hook
 function useCursor() {
-  const [cursor, dispatch] = useReducer(reducer, {}, initState);
+  const [state, dispatch] = useReducer(reducer, {}, initState);
   // Blank actions
-  // () => plainAction("SOME_ACTION")
-  const plainAction = useCallback(plainDispatcher(dispatch), []);
+  // () => createAction("SOME_ACTION")
+  const createAction = useCallback(createDispatcher(dispatch), []);
   // (e) => eventAction("SOME_ACTION")
   const eventAction = useCallback(eventDispatcher(dispatch), []);
   // (e) => itemEventAction("SOME_ACTION")(index)
@@ -71,7 +85,7 @@ function useCursor() {
   const getDraggableItemEvents = useCallback(
     ({ index, id }) => ({
       onMouseDown: itemEventAction("MOUSE_DOWN")({ index, id }),
-      onMouseEnter: itemEventAction("MOUSE_ENTER")({ index, id }),
+      // onMouseEnter: itemEventAction("MOUSE_ENTER")({ index, id }),
       onDragEnd: eventAction("DRAG_END"),
       onTouchStart: itemEventAction("TOUCH_START")({ index, id }),
       // onTouchMove: itemEventAction("TOUCH_MOVE")(index),
@@ -81,12 +95,17 @@ function useCursor() {
     [eventAction, itemEventAction]
   );
   // Global scope cursor events
-  useDocumentEvents({ ...cursor, eventAction });
-  usePress({ plainAction, ...cursor });
+  useDocumentEvents({ ...state, eventAction });
+  usePress({ createAction, ...state });
   // Log effect
-  // useEffect(() => console.log(cursor), [cursor]);
+  useEffect(() => log.debug("useCursor state update", state), [state]);
 
-  return [cursor, getDraggableItemEvents];
+  // Methods
+  const setMethods = useCallback(createAction("SET_METHODS"), []);
+  const setOverItem = useCallback(createAction("SET_OVER_ITEM"), []);
+  useEffect(() => setMethods({ setOverItem }), [setMethods, setOverItem]);
+
+  return [state, getDraggableItemEvents];
 }
 
 export default useCursor;

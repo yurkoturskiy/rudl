@@ -9,13 +9,13 @@ const cancelAwait = setAwait =>
     return null;
   });
 
-function usePress({ plainAction, isTouch }) {
+function usePress({ createAction, isTouch }) {
   // Press Gesture
   const [pressDelay, awaitPress] = useState();
   const [longPressDelay, awaitLongPress] = useState();
   // Press actions
-  const onPress = useCallback(plainAction("PRESS"), [plainAction]);
-  const onLongPress = useCallback(plainAction("LONG_PRESS"), [plainAction]);
+  const onPress = useCallback(createAction("PRESS"), []);
+  const onLongPress = useCallback(createAction("LONG_PRESS"), []);
 
   const setTimeouts = useCallback(() => {
     !pressDelay && awaitGesture(awaitPress, onPress, 300);
