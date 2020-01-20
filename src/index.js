@@ -19,7 +19,10 @@ import ItemComponent from "./components/ItemComponent";
 // import * as log from "loglevel";
 var log = require("loglevel");
 log.setLevel("warn");
-log.getLogger("ghost").setLevel("trace");
+log.getLogger("useGhost").setLevel("trace");
+log.getLogger("useCursor").setLevel("trace");
+log.getLogger("useGrid").setLevel("warn");
+log.getLogger("useItems").setLevel("trace");
 
 //////////////////////////////
 /* Masonry layout component */
