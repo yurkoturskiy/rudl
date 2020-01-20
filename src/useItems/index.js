@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useReducer, useCallback } from "react";
 import reorder from "./reorder";
 import init from "./init";
 import logger from "../utils/logger";
+import checkOverItem from "./checkOverItem";
+import { type } from "ramda";
 const { log } = logger("useItems");
 
 const reducer = (state, action) => {
@@ -9,9 +11,12 @@ const reducer = (state, action) => {
   switch (action.type) {
     case "UPDATE":
       return init({ state, ...action.payload });
+    case "CHECK_OVER_ITEM":
+      return checkOverItem({ state, ...action.payload });
     case "REORDER":
-      return reorder({ state, ...action.payload });
+      return reorder(state);
     case "REARRANGED":
+      state.setOverItem(null);
       return { ...state, isRearranges: false };
     default:
       return state;
@@ -29,47 +34,68 @@ function useItems({
   onRearrange
 }) {
   const [state, dispatch] = useReducer(reducer, [], () =>
-    init({ children, getDraggableItemEvents, transitionDuration, onRearrange })
+    init({
+      children,
+      getDraggableItemEvents,
+      transitionDuration,
+      onRearrange
+    })
   );
   // Actions from template
   const createAction = useCallback(createDispatcher(dispatch), []);
-  const onUpdate = useCallback(createAction("UPDATE"), []);
-  const onReorder = useCallback(createAction("REORDER"), []);
-  const onRearranged = useCallback(createAction("REARRANGED"), []);
+  const update = useCallback(createAction("UPDATE"), []);
+  const checkOverItem = useCallback(createAction("CHECK_OVER_ITEM"), []);
+  const reorder = useCallback(createAction("REORDER"), []);
+  const rearranged = useCallback(createAction("REARRANGED"), []);
   // Update items when children changed
-  useEffect(() => onUpdate({ children, getDraggableItemEvents }), [
-    onUpdate,
+  useEffect(() => update({ children, getDraggableItemEvents }), [
+    update,
     children,
     getDraggableItemEvents,
     transitionDuration,
     onRearrange
   ]);
-  // Reorder on drag
+
+  // Validate cursor items
   useEffect(() => {
     cursor.isDrag &&
       !state.isRearranges &&
-      cursor.overItem &&
-      cursor.item &&
-      cursor.overItem.index !== cursor.item.index &&
-      onReorder({
-        dragItem: cursor.item,
-        overItem: cursor.overItem
+      cursor.overItemId &&
+      cursor.dragItemId &&
+      cursor.overItemId !== cursor.dragItemId &&
+      checkOverItem({
+        dragItemId: cursor.dragItemId,
+        dragItemIndex: cursor.dragItemIndex,
+        overItemId: cursor.overItemId,
+        overItemIndex: cursor.overItemIndex,
+        setOverItem: cursor.setOverItem
       });
   }, [
+    checkOverItem,
+    cursor.dragItemId,
+    cursor.dragItemIndex,
     cursor.isDrag,
-    state.isRearranges,
-    onReorder,
-    cursor.overItem,
-    cursor.item
+    cursor.overItemId,
+    cursor.overItemIndex,
+    cursor.setOverItem,
+    state.isRearranges
   ]);
+
+  // Reorder on drag
+  useEffect(() => {
+    type(state.overItemIndex) === "Number" &&
+      type(state.dragItemIndex) === "Number" &&
+      reorder();
+  }, [reorder, state.overItemIndex, state.dragItemIndex]);
+
   // Rearranging
   useEffect(() => {
-    state.isRearranges && setTimeout(() => onRearranged(), transitionDuration);
-  }, [onRearranged, state.isRearranges, transitionDuration]);
+    state.isRearranges && setTimeout(() => rearranged(), transitionDuration);
+  }, [rearranged, state.isRearranges, transitionDuration]);
   // Logging
   useEffect(() => log.debug("useItems state update", state), [state]);
 
-  return [state.list, onReorder];
+  return [state.list, reorder];
 }
 
 export default useItems;

@@ -35,10 +35,13 @@ const getListOfItems = ({ children, getDraggableItemEvents }) =>
 export default ({ state, children, getDraggableItemEvents, ...initArgs }) => ({
   ...state,
   ...initArgs,
-  dragItem: null,
-  overItem: null,
+  dragItemId: null,
+  dragItemIndex: null,
+  overItemId: null,
+  overItemIndex: null,
   dragItemPrevOrder: null,
   dragItemNewOrder: null,
   isRearranges: false,
+  setOverItem: null,
   list: getListOfItems({ children, getDraggableItemEvents })
 });

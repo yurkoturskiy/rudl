@@ -49,7 +49,7 @@ function useGhost(cursor, items, transitionParams) {
       !state.isActive &&
       onStart({
         cursor,
-        item: items[cursor.item.index],
+        item: items[cursor.dragItemIndex],
         transitionParams,
         onTransitionEnd
       });

@@ -29,25 +29,10 @@ const assignNewOrder = ([
   return { ...item, order };
 };
 
-const findItemById = (items, id) => items.find(item => item.id === id);
-
-// Validate if index is presented. In case of touch interfaces it is not
-const validateItemsParams = ({ state, dragItem, overItem }) => ({
-  ...state,
-  dragItem: {
-    id: dragItem.id,
-    index: dragItem.index || findItemById(state.list, dragItem.id).index
-  },
-  overItem: {
-    id: overItem.id,
-    index: overItem.index || findItemById(state.list, overItem.id).index
-  }
-});
-
 const updateDragItemOrders = state => ({
   ...state,
-  dragItemPrevOrder: state.list[state.dragItem.index].order,
-  dragItemNewOrder: state.list[state.overItem.index].order
+  dragItemPrevOrder: state.list[state.dragItemIndex].order,
+  dragItemNewOrder: state.list[state.overItemIndex].order
 });
 
 const rearrangeItems = fn => state => ({
@@ -56,22 +41,31 @@ const rearrangeItems = fn => state => ({
   list: map(fn([state.dragItemPrevOrder, state.dragItemNewOrder]), state.list)
 });
 
+const resetOverItem = state => {
+  state.setOverItem(null);
+  return state;
+};
+
 const onRearrange = state => {
   state.onRearrange(state);
   return {
     ...state,
+    dragItemId: null,
+    dragItemIndex: null,
+    overItemId: null,
+    overItemIndex: null,
     dragItemPrevOrder: null,
     dragItemNewOrder: null
   };
 };
 
 export default pipe(
-  validateItemsParams,
-  trace("validate items"),
   updateDragItemOrders,
   trace("update drag item orders"),
   rearrangeItems(assignNewOrder),
   trace("rearrange items"),
+  resetOverItem,
+  trace("reset over item"),
   onRearrange,
   trace("on rearrange")
 );
