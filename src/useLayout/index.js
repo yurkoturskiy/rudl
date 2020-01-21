@@ -1,4 +1,5 @@
 import React, { useReducer } from "react";
+import resize from "./reducerHandlers/resize";
 import setItemWrapperWidth from "./reducerHandlers/setItemWrapperWidth";
 import setReferencedItem from "./reducerHandlers/setReferencedItem";
 
@@ -33,6 +34,8 @@ const reducer = (state, action) => {
       return setReferencedItem(state, action.payload);
     case "SET_ITEM_WRAPPER_WIDTH":
       return setItemWrapperWidth(state);
+    case "RESIZE":
+      return resize(state, action.payload);
   }
 };
 
