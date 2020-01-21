@@ -1,4 +1,6 @@
 import React, { useReducer } from "react";
+import setReferencedItem from "./reducerHandlers/setReferencedItem";
+
 const initState = ({ state } = {}) => ({
   ...state,
   isMount: false,
@@ -25,6 +27,10 @@ const initState = ({ state } = {}) => ({
 });
 
 const reducer = (state, action) => {
+  switch (action.type) {
+    case "SET_REFERENCED_ITEM":
+      return setReferencedItem(state, action.payload);
+  }
 };
 
 function useLayout(wrapperWidth, items) {
