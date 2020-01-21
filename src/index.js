@@ -10,7 +10,6 @@ import PropTypes from "prop-types";
 import useCursor from "./useCursor/index";
 import useItems from "./useItems/index";
 import useGhost from "./useGhost/index";
-import useGrid from "./useGrid/index";
 import useBody from "./useBody";
 // Components
 import BoundryBox from "./components/BoundryBox";
@@ -19,6 +18,7 @@ import Endline from "./components/Endline";
 import Header from "./components/Header";
 import ItemComponent from "./components/ItemComponent";
 import useResponsiveRef from "./useResponsiveRef";
+import useLayout from "./useLayout";
 // Loglevel setup
 var log = require("loglevel");
 log.setLevel("warn");
@@ -61,10 +61,8 @@ function DraggableMasonryLayout(props) {
   });
 
   const body = useBody(cursor);
-
-  // useGrid(items, masonryLayoutRef);
-
   const [layoutRef, layoutWrapperWidth] = useResponsiveRef();
+  const newLayout = useLayout();
 
   ////////////////////
   /* Masonry Layout */
