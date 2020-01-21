@@ -54,7 +54,7 @@ function DraggableMasonryLayout(props) {
     transitionDuration,
     onRearrange
   });
-  const newGhost = useGhost(cursor, items, {
+  const ghost = useGhost(cursor, items, {
     ghostTransitionTimingFunction,
     ghostTransitionDuration
   });
@@ -63,8 +63,6 @@ function DraggableMasonryLayout(props) {
 
   // useGrid(items, masonryLayoutRef);
 
-  // Ghost
-  const [ghost, setGhost] = useState();
 
   ////////////////////
   /* Masonry Layout */
@@ -249,13 +247,15 @@ function DraggableMasonryLayout(props) {
           layoutIsMount={layoutIsMount}
           transitionDuration={transitionDuration}
           transitionTimingFunction={transitionTimingFunction}
-          ghost={ghost}
+          ghostSourceId={ghost.sourceId}
+          ghostIsActive={ghost.isActive}
           loadHandler={loadHandler}
           errorHandler={errorHandler}
         />
       )),
     [
-      ghost,
+      ghost.isActive,
+      ghost.source,
       items,
       layout.elements,
       layoutIsMount,
@@ -279,7 +279,7 @@ function DraggableMasonryLayout(props) {
         layoutIsMount={layoutIsMount}
       >
         {renderItems}
-        {newGhost.isActive && newGhost.component}
+        {ghost.isActive && ghost.component}
         {typeof layout.endline.start.y === "number" && (
           <Endline
             startRef={endlineStartRef}

@@ -9,7 +9,7 @@ function ItemComponent({
   layoutIsMount,
   transitionDuration,
   transitionTimingFunction,
-  ghost,
+  ghostIsActive,
   loadHandler,
   errorHandler,
   onClickCapture
@@ -32,7 +32,7 @@ function ItemComponent({
             : "none"
         }`,
         visibility: layoutElement && layoutIsMount ? "visible" : "hidden",
-        opacity: ghost && ghostSourceId === item.id ? 0 : 1
+        opacity: ghostIsActive && ghostSourceId === item.id ? 0 : 1
       }}
       onLoad={loadHandler}
       onError={errorHandler}
@@ -51,7 +51,7 @@ ItemComponent.propTypes = {
   layoutIsMount: PropTypes.bool,
   transitionDuration: PropTypes.number,
   transitionTimingFunction: PropTypes.string,
-  ghost: PropTypes.node,
+  ghostIsActive: PropTypes.bool,
   loadHandler: PropTypes.func,
   errorHandler: PropTypes.func,
   onClickCapture: PropTypes.func

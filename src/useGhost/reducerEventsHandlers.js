@@ -14,13 +14,17 @@ export const initState = ({ state } = {}) => ({
   isTransit: false,
   id: null,
   pos: null,
-  source: null,
   className: null,
   kernel: null,
   transDur: null,
   transTFunc: null,
   onTransitionEnd: null,
-  transitionTimeout: null
+  transitionTimeout: null,
+  // source
+  sourceItem: null,
+  sourceId: null,
+  sourceElement: null,
+  sourceClassList: null
 });
 
 const calcGhostPos = cursor => ({
@@ -28,33 +32,33 @@ const calcGhostPos = cursor => ({
   y: cursor.pos.y - cursor.dragPoint.y
 });
 
-const setSourceItem = item => ({ item });
-const setSourceId = source => ({ ...source, id: source.item.id });
-const setSourceElement = source => ({
-  ...source,
-  element: document.getElementById(source.id)
+const setSourceItem = item => ({ sourceItem: item });
+const setSourceId = ghost => ({ ...ghost, sourceId: ghost.sourceItem.id });
+const setSourceElement = ghost => ({
+  ...ghost,
+  sourceElement: document.getElementById(ghost.sourceId)
 });
-const setClassList = source => ({
-  ...source,
-  classList: source.element.classList
+const setClassList = ghost => ({
+  ...ghost,
+  sourceClassList: ghost.sourceElement.classList
 });
-const addGhostClass = source => {
-  source.classList.add("ghost");
-  return source;
+const addGhostClass = ghost => {
+  ghost.sourceClassList.add("ghost");
+  return ghost;
 };
-const addTouchClass = cursor => source => {
-  cursor.isTouch && source.classList.add("touch");
-  return source;
+const addTouchClass = cursor => ghost => {
+  cursor.isTouch && ghost.sourceClassList.add("touch");
+  return ghost;
 };
-const setGhostSource = source => ({ source });
-const setGhostId = ghost => ({ ...ghost, id: `${ghost.source.id}-ghost` });
+const setGhostSource = ghost => ({ ...ghost });
+const setGhostId = ghost => ({ ...ghost, id: `${ghost.sourceId}-ghost` });
 const setGhostClassName = ghost => ({
   ...ghost,
-  className: ghost.source.classList
+  className: ghost.sourceClassList
 });
 const setGhostComponent = ghost => ({
   ...ghost,
-  kernel: cloneElement(ghost.source.item.element, {
+  kernel: cloneElement(ghost.sourceItem.element, {
     draggableItem: { id: ghost.id, className: ghost.className }
   })
 });
@@ -122,16 +126,16 @@ export const drop = ({ state }) => ({
   ...state,
   isDrop: true,
   isTransit: true,
-  pos: getWrapperFixedPosFromSourceId(state.source.id),
+  pos: getWrapperFixedPosFromSourceId(state.sourceId),
   transitionTimeout: setTimeout(state.onTransitionEnd, state.transDur + 100)
 });
 
-const resetSourceClassList = source =>
-  source.element.classList.remove("ghost", "touch");
+const resetSourceClassList = sourceElement =>
+  sourceElement.classList.remove("ghost", "touch");
 
 export const end = ({ state }) => {
   log("end")();
-  resetSourceClassList(state.source);
+  resetSourceClassList(state.sourceElement);
   clearTimeout(state.transitionTimeout);
   return initState({ state });
 };
