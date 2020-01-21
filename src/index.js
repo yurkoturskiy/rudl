@@ -18,6 +18,7 @@ import Ghost from "./components/Ghost";
 import Endline from "./components/Endline";
 import Header from "./components/Header";
 import ItemComponent from "./components/ItemComponent";
+import useResponsiveRef from "./useResponsiveRef";
 // Loglevel setup
 var log = require("loglevel");
 log.setLevel("warn");
@@ -63,6 +64,7 @@ function DraggableMasonryLayout(props) {
 
   // useGrid(items, masonryLayoutRef);
 
+  const [layoutRef, layoutWrapperWidth] = useResponsiveRef();
 
   ////////////////////
   /* Masonry Layout */
@@ -267,6 +269,7 @@ function DraggableMasonryLayout(props) {
 
   return (
     <div className="masonry" ref={masonryLayoutRef}>
+      <div ref={layoutRef} />
       {props.header && layoutIsMount && (
         <Header width={layout.width} component={props.header} />
       )}
