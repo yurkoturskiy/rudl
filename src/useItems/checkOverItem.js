@@ -14,7 +14,7 @@ const checkOverItem = ({
 }) => ({
   ...state,
   overItemId,
-  overItemIndex: overItemIndex || getIndexFromId(state.list, overItemId),
+  overItemIndex: overItemIndex || getIndexFromId(state.items, overItemId),
   dragItemId,
   dragItemIndex,
   setOverItem

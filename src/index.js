@@ -27,6 +27,7 @@ log.getLogger("useCursor").setLevel("warn");
 log.getLogger("useGrid").setLevel("warn");
 log.getLogger("useItems").setLevel("warn");
 log.getLogger("useBody").setLevel("warn");
+log.getLogger("useLayout").setLevel("trace");
 
 //////////////////////////////
 /* Masonry layout component */
@@ -48,7 +49,7 @@ function DraggableMasonryLayout(props) {
   const endlineEndRef = useRef(); // Endline end sensor
 
   const [cursor, getDraggableItemEvents] = useCursor();
-  const [items, reorder] = useItems({
+  const { items } = useItems({
     children,
     getDraggableItemEvents,
     cursor,
@@ -62,7 +63,7 @@ function DraggableMasonryLayout(props) {
 
   const body = useBody(cursor);
   const [layoutRef, layoutWrapperWidth] = useResponsiveRef();
-  const newLayout = useLayout();
+  const newLayout = useLayout(layoutWrapperWidth, items);
 
   ////////////////////
   /* Masonry Layout */
