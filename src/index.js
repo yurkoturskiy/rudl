@@ -69,7 +69,6 @@ function DraggableMasonryLayout(props) {
   /* Masonry Layout */
   ////////////////////
   const [layoutIsMount, setLayoutIsMount] = useState(false);
-  const [columns, setColumns] = useState(0);
   const [transition, setTransition] = useState(false);
   const [layout, setLayout] = useState({
     elements: [],
@@ -91,37 +90,15 @@ function DraggableMasonryLayout(props) {
   ////////////
   // Resize //
   ////////////
-  const [winWidth, setWinWidth] = useState(window.innerWidth);
-  const [isResized, setIsResized] = useState(false);
-  const handleResize = evt => setIsResized(true);
   useEffect(() => {
     // Mount and unmount only
     // Add/remove event listeners
     // checkLayout();
-    window.addEventListener("resize", handleResize);
     window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener("resize", handleResize);
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-  useEffect(() => {
-    const widthIsResized = window.innerWidth !== winWidth;
-    if (widthIsResized) {
-      props.onWidthResize();
-      setWinWidth(window.innerWidth);
-    }
-    // Check layout
-    const wrapperWidth = masonryLayoutRef.current.offsetWidth;
-    const cardRefItem = items.find(item => !item.isSeparator);
-    const cardWrapperWidth =
-      items[0].width ||
-      document.getElementById(`${cardRefItem.id}-wrapper`).offsetWidth;
-    setColumns(Math.floor(wrapperWidth / cardWrapperWidth));
-    // Turn on transition if window resizing
-    setTransition(isResized);
-    setIsResized(false);
-  }, [isResized, items]);
 
   const handleScroll = e => {
     checkEndlineEnterEvent();
@@ -148,7 +125,7 @@ function DraggableMasonryLayout(props) {
 
   useEffect(() => {
     // component did mount or update
-    if (masonryLayoutRef.current.offsetHeight > 0) {
+    if (1000 > 0) {
       // if layout rendered
       setLayoutIsMount(true);
       checkEndlineEnterEvent();
@@ -173,63 +150,6 @@ function DraggableMasonryLayout(props) {
     });
   }, [items, layout.elements.length]);
 
-  useEffect(() => {
-    // set layout
-    let elements = [];
-    let endline = layout.endline;
-    let cardWrapperWidth;
-    endline.byColumns = Array(columns).fill(0);
-    const itemsSortedByOrder = items.concat().sort((a, b) => a.order - b.order);
-    itemsSortedByOrder.forEach((item, index) => {
-      // Calculate positions of each element
-      const cardWrapperElement = document.getElementById(`${item.id}-wrapper`);
-      const height = item.height || cardWrapperElement.offsetHeight;
-      cardWrapperWidth = item.width || cardWrapperElement.offsetWidth;
-      const cardElement = document.getElementById(item.id);
-      const cardWidth = item.width || cardElement.offsetWidth;
-      const cardHeight = item.height || cardElement.offsetHeight;
-      const cardOffsetLeft = cardElement.offsetLeft;
-      const cardOffsetTop = cardElement.offsetTop;
-      const leastNum = Math.min(...endline.byColumns);
-      const leastNumIndex = endline.byColumns.indexOf(leastNum);
-      const maxNum = Math.max(...endline.byColumns);
-      const maxNumIndex = endline.byColumns.indexOf(maxNum);
-      let x, y;
-      if (item.isSeparator) {
-        x = 0;
-        y = endline.byColumns[maxNumIndex];
-        let newLine = endline.byColumns[maxNumIndex] + height;
-        endline.byColumns.fill(newLine);
-      } else {
-        x = leastNumIndex * cardWrapperWidth;
-        y = endline.byColumns[leastNumIndex];
-        endline.byColumns[leastNumIndex] += height;
-      }
-      elements[item.index] = {
-        x,
-        y,
-        cardWidth,
-        cardHeight,
-        cardOffsetLeft,
-        cardOffsetTop
-      };
-    });
-    endline.start.x =
-      cardWrapperWidth *
-      endline.byColumns.indexOf(Math.min(...endline.byColumns));
-    endline.start.y = Math.min(...endline.byColumns);
-    endline.end.x =
-      cardWrapperWidth *
-      endline.byColumns.indexOf(Math.max(...endline.byColumns));
-    endline.end.y = Math.max(...endline.byColumns);
-    setLayout({
-      elements: elements, // list of all elements with coorditares
-      width: cardWrapperWidth * columns, // width of the whole layout
-      height: endline.end.y, // height of the whole layout
-      endline: endline
-    });
-  }, [columns, onLoadCount, onErrorCount, items, layout.endline]);
-
   const errorHandler = index => {
     setOnErrorCount(onErrorCount + 1);
     console.log("can't load: ", index);
@@ -243,9 +163,9 @@ function DraggableMasonryLayout(props) {
         <ItemComponent
           item={item}
           key={`${item.id}-wrapper`}
-          layoutElement={layout.elements[index]}
-          transition={transition}
-          layoutIsMount={layoutIsMount}
+          layoutElement={newLayout.isMount && newLayout.units[index]}
+          transition={newLayout.transition}
+          layoutIsMount={newLayout.isMount}
           transitionDuration={transitionDuration}
           transitionTimingFunction={transitionTimingFunction}
           ghostSourceId={ghost.sourceId}
@@ -258,8 +178,8 @@ function DraggableMasonryLayout(props) {
       ghost.isActive,
       ghost.source,
       items,
-      layout.elements,
-      layoutIsMount,
+      newLayout.units,
+      newLayout.isMount,
       transition,
       transitionDuration,
       transitionTimingFunction
@@ -267,29 +187,29 @@ function DraggableMasonryLayout(props) {
   );
 
   return (
-    <div className="masonry" ref={masonryLayoutRef}>
-      <div ref={layoutRef} />
-      {props.header && layoutIsMount && (
-        <Header width={layout.width} component={props.header} />
+    <div className="masonry" ref={layoutRef}>
+      {/*<div ref={masonryLayoutRef} /> */}
+      {props.header && newLayout.isMount && (
+        <Header width={newLayout.width} component={props.header} />
       )}
       <BoundryBox
-        width={layout.width}
-        height={layout.height}
+        width={newLayout.width}
+        height={newLayout.height}
         transitionDuration={transitionDuration}
         transitionTimingFunction={transitionTimingFunction}
-        transition={transition}
-        layoutIsMount={layoutIsMount}
+        transition={newLayout.transition}
+        layoutIsMount={newLayout.isMount}
       >
         {renderItems}
         {ghost.isActive && ghost.component}
-        {typeof layout.endline.start.y === "number" && (
+        {typeof newLayout.endlineStartY === "number" && (
           <Endline
             startRef={endlineStartRef}
             endRef={endlineEndRef}
-            startX={layout.endline.start.x}
-            startY={layout.endline.start.y}
-            endX={layout.endline.end.x}
-            endY={layout.endline.end.y}
+            startX={newLayout.endlineStartX}
+            startY={newLayout.endlineStartY}
+            endX={newLayout.endlineEndX}
+            endY={newLayout.endlineEndY}
           />
         )}
       </BoundryBox>
