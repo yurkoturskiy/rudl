@@ -13,6 +13,7 @@ function useResponsiveRef() {
   ]);
 
   useEffect(() => {
+    setWidth(ref.current.offsetWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [handleResize]);
