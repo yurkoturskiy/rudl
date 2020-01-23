@@ -23,7 +23,8 @@ const setItemWrapperElement = state => ({
 
 const setItemWrapperWidth = state => ({
   ...state,
-  itemWrapperWidth: state.itemWrapperElement.offsetWidth
+  itemWrapperWidth:
+    state.referencedItem.width || state.itemWrapperElement.offsetWidth
 });
 
 const setNumOfColumns = state => ({
