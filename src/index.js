@@ -14,7 +14,7 @@ import useBody from "./useBody";
 // Components
 import BoundryBox from "./components/BoundryBox";
 import Ghost from "./components/Ghost";
-import Endline from "./components/Endline";
+import Endline from "./Endline/index";
 import Header from "./components/Header";
 import ItemComponent from "./components/ItemComponent";
 import useResponsiveRef from "./useResponsiveRef";
@@ -28,6 +28,7 @@ log.getLogger("useGrid").setLevel("warn");
 log.getLogger("useItems").setLevel("warn");
 log.getLogger("useBody").setLevel("warn");
 log.getLogger("useLayout").setLevel("trace");
+log.getLogger("Endline").setLevel("warn");
 
 //////////////////////////////
 /* Masonry layout component */
@@ -44,9 +45,7 @@ function DraggableMasonryLayout(props) {
     onRearrange
   } = props;
   // Refs
-  const masonryLayoutRef = useRef(); // Top wrapper
   const endlineStartRef = useRef(); // Endline start sensor
-  const endlineEndRef = useRef(); // Endline end sensor
 
   const [layoutRef, layoutWrapperWidth] = useResponsiveRef(props.onWidthResize);
 
@@ -202,15 +201,8 @@ function DraggableMasonryLayout(props) {
       >
         {renderItems}
         {ghost.isActive && ghost.component}
-        {typeof newLayout.endlineStartY === "number" && (
-          <Endline
-            startRef={endlineStartRef}
-            endRef={endlineEndRef}
-            startX={newLayout.endlineStartX}
-            startY={newLayout.endlineStartY}
-            endX={newLayout.endlineEndX}
-            endY={newLayout.endlineEndY}
-          />
+        {newLayout.isMount && props.onEndlineEnter && (
+          <Endline layout={newLayout} onEndlineEnter={props.onEndlineEnter} />
         )}
       </BoundryBox>
     </div>
