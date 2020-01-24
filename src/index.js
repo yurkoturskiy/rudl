@@ -48,6 +48,8 @@ function DraggableMasonryLayout(props) {
   const endlineStartRef = useRef(); // Endline start sensor
   const endlineEndRef = useRef(); // Endline end sensor
 
+  const [layoutRef, layoutWrapperWidth] = useResponsiveRef(props.onWidthResize);
+
   const [cursor, getDraggableItemEvents] = useCursor();
   const { items } = useItems({
     children,
@@ -60,9 +62,7 @@ function DraggableMasonryLayout(props) {
     ghostTransitionTimingFunction,
     ghostTransitionDuration
   });
-
   const body = useBody(cursor);
-  const [layoutRef, layoutWrapperWidth] = useResponsiveRef();
   const newLayout = useLayout(layoutWrapperWidth, items);
 
   ////////////////////

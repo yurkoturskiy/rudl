@@ -5,12 +5,15 @@
 
 import React, { useEffect, useCallback, useRef, useState } from "react";
 
-function useResponsiveRef() {
+function useResponsiveRef(action) {
   const [width, setWidth] = useState(null);
   const ref = useRef(null);
-  const handleResize = useCallback(() => setWidth(ref.current.offsetWidth), [
-    ref
-  ]);
+  const onWidthResize = useCallback(action, [action]);
+  const handleResize = useCallback(() => {
+    const newWidth = ref.current.offsetWidth;
+    width !== newWidth && onWidthResize(newWidth);
+    setWidth(newWidth);
+  }, [onWidthResize, width]);
 
   useEffect(() => {
     setWidth(ref.current.offsetWidth);
