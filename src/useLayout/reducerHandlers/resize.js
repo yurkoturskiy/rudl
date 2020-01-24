@@ -2,6 +2,8 @@ import { pipe, update, adjust } from "ramda";
 
 const setItems = items => state => ({
   ...state,
+  prevNumOfItems: state.numOfItems,
+  numOfItems: items.length,
   itemsSortedByOrder: items.concat().sort((a, b) => a.order - b.order),
   referencedItem: items.find(item => !item.isSeparator)
 });

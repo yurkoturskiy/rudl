@@ -12,6 +12,9 @@ const initState = ({ state } = {}) => ({
   transition: false,
   wrapperWidth: null,
   numOfColumns: null,
+  // Number of items
+  prevNumOfItems: null,
+  numOfItems: null,
   // Referenced item as an example of unit's width
   referencedItem: null,
   itemWrapperWidth: null,
