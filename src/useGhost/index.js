@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, useCallback } from "react";
+import React, { useState, useReducer, useEffect, useCallback } from "react";
 import { initState, start, move, drop, end } from "./reducerEventsHandlers";
 import Ghost from "../components/Ghost";
 import logger from "../utils/logger";
@@ -75,8 +75,7 @@ function useGhost(cursor, items, transitionParams) {
   // Log effect
   useEffect(() => log.debug("useGhost state update", state), [state]);
 
-  const component = state.isActive && <Ghost {...state} />;
-  return { ...state, component };
+  return { ...state };
 }
 
 export default useGhost;

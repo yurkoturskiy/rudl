@@ -195,7 +195,7 @@ function DraggableMasonryLayout(props) {
         layoutIsMount={newLayout.isMount}
       >
         {renderItems}
-        {ghost.isActive && ghost.component}
+        {ghost.isActive && <Ghost {...ghost} />}
         {newLayout.isMount && props.onEndlineEnter && (
           <Endline layout={newLayout} onEndlineEnter={props.onEndlineEnter} />
         )}
