@@ -46,11 +46,8 @@ function DraggableMasonryLayout(props) {
     children,
     onRearrange
   } = props;
-  // Refs
-  const endlineStartRef = useRef(); // Endline start sensor
 
   const [layoutRef, layoutWrapperWidth] = useResponsiveRef(props.onWidthResize);
-
   const [cursor, getDraggableItemEvents] = useCursor();
   const { items } = useItems({
     children,

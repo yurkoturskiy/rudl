@@ -51,22 +51,15 @@ const reducer = (state, action) => {
 
 function Endline({ layout, onEndlineEnter }) {
   const [state, dispatch] = useReducer(reducer, {}, initState);
-  const endlineStartRef = useRef(); // Endline start sensor
-  const endlineEndRef = useRef(); // Endline end sensor
-  const startX = layout.endlineStartX;
-  const startY = layout.endlineStartY;
-  const endX = layout.endlineEndX;
-  const endY = layout.endlineEndY;
-
   const handleScrollEvent = useCallback(
     createReferencedAction(dispatch, endlineStartRef, "SCROLL"),
     []
   );
-
   const handleEnlineEnter = useCallback(
     createAction(dispatch, "ENDLINE_ENTER")
   );
 
+  // Endline enter event
   useEffect(() => {
     state.endlineDistanceToViewport <= 0 &&
       state.lastTriggeredNumOfItems !== layout.numOfItems &&
@@ -76,6 +69,7 @@ function Endline({ layout, onEndlineEnter }) {
       });
   }, [handleEnlineEnter, layout.numOfItems, onEndlineEnter, state]);
 
+  // Scroll event
   useEffect(() => {
     handleScrollEvent();
     layout.isMount && window.addEventListener("scroll", handleScrollEvent);
@@ -85,6 +79,15 @@ function Endline({ layout, onEndlineEnter }) {
   }, [handleScrollEvent, layout.isMount]);
 
   useEffect(() => log.debug("Endline state update", state), [state]);
+
+  // Render's values
+  const endlineStartRef = useRef(); // Endline start sensor
+  const endlineEndRef = useRef(); // Endline end sensor
+  const startX = layout.endlineStartX;
+  const startY = layout.endlineStartY;
+  const endX = layout.endlineEndX;
+  const endY = layout.endlineEndY;
+
   return (
     <>
       <div
