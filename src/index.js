@@ -37,7 +37,7 @@ log.getLogger("Endline").setLevel("warn");
 //////////////////////////////
 var longPress, press, ghostTimeout;
 // General
-function DraggableMasonryLayout({
+function Rudl({
   transitionTimingFunction,
   transitionDuration,
   ghostTransitionDuration,
@@ -117,7 +117,7 @@ function DraggableMasonryLayout({
   );
 }
 
-DraggableMasonryLayout.propTypes = {
+Rudl.propTypes = {
   header: PropTypes.element,
   children: PropTypes.element,
   reverse: PropTypes.bool,
@@ -130,11 +130,11 @@ DraggableMasonryLayout.propTypes = {
   ghostTransitionTimingFunction: PropTypes.string
 };
 
-DraggableMasonryLayout.defaultProps = {
+Rudl.defaultProps = {
   transitionDuration: 600,
   transitionTimingFunction: "ease",
   ghostTransitionDuration: 200,
   ghostTransitionTimingFunction: "ease"
 };
 
-export default DraggableMasonryLayout;
+export default Rudl;
