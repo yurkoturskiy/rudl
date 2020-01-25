@@ -37,17 +37,18 @@ log.getLogger("Endline").setLevel("warn");
 //////////////////////////////
 var longPress, press, ghostTimeout;
 // General
-function DraggableMasonryLayout(props) {
-  const {
-    transitionTimingFunction,
-    transitionDuration,
-    ghostTransitionDuration,
-    ghostTransitionTimingFunction,
-    children,
-    onRearrange
-  } = props;
-
-  const [layoutRef, layoutWrapperWidth] = useResponsiveRef(props.onWidthResize);
+function DraggableMasonryLayout({
+  transitionTimingFunction,
+  transitionDuration,
+  ghostTransitionDuration,
+  ghostTransitionTimingFunction,
+  children,
+  onRearrange,
+  onWidthResize,
+  header,
+  onEndlineEnter
+}) {
+  const [layoutRef, layoutWrapperWidth] = useResponsiveRef(onWidthResize);
   const [cursor, getDraggableItemEvents] = useCursor();
   const { items } = useItems({
     children,
@@ -61,7 +62,7 @@ function DraggableMasonryLayout(props) {
     ghostTransitionDuration
   });
   const body = useBody(cursor);
-  const newLayout = useLayout(layoutWrapperWidth, items);
+  const layout = useLayout(layoutWrapperWidth, items);
   const loadHandler = useLoadHandler();
 
   const renderItems = useMemo(
@@ -70,9 +71,9 @@ function DraggableMasonryLayout(props) {
         <ItemComponent
           item={item}
           key={`${item.id}-wrapper`}
-          layoutElement={newLayout.isMount && newLayout.units[index]}
-          transition={newLayout.transition}
-          layoutIsMount={newLayout.isMount}
+          layoutElement={layout.isMount && layout.units[index]}
+          transition={layout.transition}
+          layoutIsMount={layout.isMount}
           transitionDuration={transitionDuration}
           transitionTimingFunction={transitionTimingFunction}
           ghostSourceId={ghost.sourceId}
@@ -82,9 +83,9 @@ function DraggableMasonryLayout(props) {
       )),
     [
       items,
-      newLayout.isMount,
-      newLayout.units,
-      newLayout.transition,
+      layout.isMount,
+      layout.units,
+      layout.transition,
       transitionDuration,
       transitionTimingFunction,
       ghost.sourceId,
@@ -95,21 +96,21 @@ function DraggableMasonryLayout(props) {
 
   return (
     <div className="masonry" ref={layoutRef}>
-      {props.header && newLayout.isMount && (
-        <Header width={newLayout.width} component={props.header} />
+      {header && layout.isMount && (
+        <Header width={layout.width} component={header} />
       )}
       <BoundryBox
-        width={newLayout.width}
-        height={newLayout.height}
+        width={layout.width}
+        height={layout.height}
         transitionDuration={transitionDuration}
         transitionTimingFunction={transitionTimingFunction}
-        transition={newLayout.transition}
-        layoutIsMount={newLayout.isMount}
+        transition={layout.transition}
+        layoutIsMount={layout.isMount}
       >
         {renderItems}
         {ghost.isActive && <Ghost {...ghost} />}
-        {newLayout.isMount && props.onEndlineEnter && (
-          <Endline layout={newLayout} onEndlineEnter={props.onEndlineEnter} />
+        {layout.isMount && onEndlineEnter && (
+          <Endline layout={layout} onEndlineEnter={onEndlineEnter} />
         )}
       </BoundryBox>
     </div>
