@@ -16,7 +16,7 @@ const reducer = (state, action) => {
     case "REORDER":
       return reorder(state);
     case "REARRANGED":
-      state.setOverItem(null);
+      state.setOverItem && state.setOverItem(null);
       return { ...state, isRearranges: false };
     default:
       return state;
