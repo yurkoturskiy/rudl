@@ -32,11 +32,6 @@ log.getLogger("useLayout").setLevel("warn");
 log.getLogger("useLoadHandler").setLevel("warn");
 log.getLogger("Endline").setLevel("warn");
 
-//////////////////////////////
-/* Masonry layout component */
-//////////////////////////////
-var longPress, press, ghostTimeout;
-// General
 function Rudl({
   transitionTimingFunction,
   transitionDuration,
