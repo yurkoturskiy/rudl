@@ -43,5 +43,9 @@ export default ({ state, children, getDraggableItemEvents, ...initArgs }) => ({
   dragItemNewOrder: null,
   isRearranges: false,
   setOverItem: null,
-  list: getListOfItems({ children, getDraggableItemEvents })
+  items: getListOfItems({ children, getDraggableItemEvents }),
+  // Methods
+  getFirstItem: function() {
+    return this.items.find(item => !item.isSeparator);
+  }
 });

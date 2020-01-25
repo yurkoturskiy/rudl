@@ -59,25 +59,15 @@ export const mouseMove = ({ state, event }) => {
   return { ...state, pos, isMove, isDrag, preventClick, overItemId };
 };
 
-export const mouseDown = ({ state, event, item }) => {
-  event.preventDefault();
-  const pos = { x: event.clientX, y: event.clientY };
-  return {
-    ...state,
-    isMouse: true,
-    initialPos: pos,
-    dragItemId: item.id,
-    dragItemIndex: item.index,
-    pos,
-    dragPoint: tryCalcItemInitPoint(pos, item.id)
-  };
-};
-
-// export const mouseEnter = ({ state, event, item }) => ({
-//   ...state,
-//   overItemId: item.id,
-//   overItemIndex: item.index
-// });
+export const mouseDown = ({ state, pos, item }) => ({
+  ...state,
+  isMouse: true,
+  initialPos: pos,
+  dragItemId: item.id,
+  dragItemIndex: item.index,
+  pos,
+  dragPoint: tryCalcItemInitPoint(pos, item.id)
+});
 
 export const clickCapture = ({ state, event }) => {
   // Prevent onClick event when dragging
@@ -90,24 +80,15 @@ export const clickCapture = ({ state, event }) => {
 
 // Touch events handlers
 
-export const touchStart = ({ state, event, item }) => {
-  event.preventDefault();
-  event.stopPropagation();
-  const numOfCursors = event.touches.length;
-  const pos = {
-    x: event.touches[0].clientX,
-    y: event.touches[0].clientY
-  };
-  return {
-    ...state,
-    isTouch: true,
-    initialPos: pos,
-    numOfCursors,
-    dragItemId: item.id,
-    dragItemIndex: item.index,
-    pos
-  };
-};
+export const touchStart = ({ state, touches, item }) => ({
+  ...state,
+  isTouch: true,
+  initialPos: touches.pos,
+  numOfCursors: touches.numOfCursors,
+  dragItemId: item.id,
+  dragItemIndex: item.index,
+  pos: touches.pos
+});
 
 export const touchMove = ({ state, event, item }) => {
   event.preventDefault();

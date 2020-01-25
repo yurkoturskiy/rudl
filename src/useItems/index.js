@@ -95,7 +95,7 @@ function useItems({
   // Logging
   useEffect(() => log.debug("useItems state update", state), [state]);
 
-  return [state.list, reorder];
+  return state;
 }
 
 export default useItems;

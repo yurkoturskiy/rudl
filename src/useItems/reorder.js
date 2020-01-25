@@ -31,14 +31,14 @@ const assignNewOrder = ([
 
 const updateDragItemOrders = state => ({
   ...state,
-  dragItemPrevOrder: state.list[state.dragItemIndex].order,
-  dragItemNewOrder: state.list[state.overItemIndex].order
+  dragItemPrevOrder: state.items[state.dragItemIndex].order,
+  dragItemNewOrder: state.items[state.overItemIndex].order
 });
 
 const rearrangeItems = fn => state => ({
   ...state,
   isRearranges: true,
-  list: map(fn([state.dragItemPrevOrder, state.dragItemNewOrder]), state.list)
+  items: map(fn([state.dragItemPrevOrder, state.dragItemNewOrder]), state.items)
 });
 
 const resetOverItem = state => {
