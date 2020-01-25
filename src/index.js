@@ -28,7 +28,7 @@ log.getLogger("useCursor").setLevel("warn");
 log.getLogger("useGrid").setLevel("warn");
 log.getLogger("useItems").setLevel("warn");
 log.getLogger("useBody").setLevel("warn");
-log.getLogger("useLayout").setLevel("trace");
+log.getLogger("useLayout").setLevel("warn");
 log.getLogger("useLoadHandler").setLevel("warn");
 log.getLogger("Endline").setLevel("warn");
 
@@ -62,90 +62,6 @@ function DraggableMasonryLayout(props) {
   });
   const body = useBody(cursor);
   const newLayout = useLayout(layoutWrapperWidth, items);
-
-  ////////////////////
-  /* Masonry Layout */
-  ////////////////////
-  const [layoutIsMount, setLayoutIsMount] = useState(false);
-  const [transition, setTransition] = useState(false);
-  const [layout, setLayout] = useState({
-    elements: [],
-    width: 0,
-    height: 0,
-    endline: {
-      start: { x: null, y: null },
-      end: { x: null, y: null },
-      byColumns: [],
-      enterEvent: {
-        elementsNum: 0,
-        eventHandler: props.onEndlineEnter && props.onEndlineEnter
-      }
-    }
-  });
-
-  ////////////
-  // Resize //
-  ////////////
-  useEffect(() => {
-    // Mount and unmount only
-    // Add/remove event listeners
-    // checkLayout();
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  const handleScroll = e => {
-    checkEndlineEnterEvent();
-  };
-
-  const checkEndlineEnterEvent = () => {
-    setLayout(layout => {
-      if (
-        endlineStartRef.current &&
-        endlineStartRef.current.getBoundingClientRect().top -
-          window.innerHeight <=
-          0 &&
-        layout.endline.enterEvent.elementsNum !== layout.elements.length
-      ) {
-        // enter endline event
-        layout.endline.enterEvent.elementsNum = layout.elements.length;
-        // execute enter endline event handler
-        layout.endline.enterEvent.eventHandler &&
-          layout.endline.enterEvent.eventHandler();
-      }
-      return layout;
-    });
-  };
-
-  useEffect(() => {
-    // component did mount or update
-    if (1000 > 0) {
-      // if layout rendered
-      setLayoutIsMount(true);
-      checkEndlineEnterEvent();
-      // setTransition(true);
-    }
-    layoutIsMount && setTransition(true);
-  });
-
-  useEffect(() => {
-    // if number of items
-    setTransition(() => {
-      if (items.length > layout.elements.length) {
-        // disable transition for infinite scroll
-        return false;
-      } else if (items.length === layout.elements.length) {
-        // enable for creation or change
-        return true;
-      } else if (items.length < layout.elements.length) {
-        // enable for deletion
-        return true;
-      }
-    });
-  }, [items, layout.elements.length]);
-
   const loadHandler = useLoadHandler();
 
   const renderItems = useMemo(
@@ -179,7 +95,6 @@ function DraggableMasonryLayout(props) {
 
   return (
     <div className="masonry" ref={layoutRef}>
-      {/*<div ref={masonryLayoutRef} /> */}
       {props.header && newLayout.isMount && (
         <Header width={newLayout.width} component={props.header} />
       )}
