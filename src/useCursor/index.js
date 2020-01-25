@@ -68,8 +68,24 @@ const createDispatcher = dispatch => type => payload =>
   dispatch({ type, payload });
 const eventDispatcher = dispatch => type => event =>
   dispatch({ type, payload: { event } });
-const itemEventDispatcher = dispatch => type => item => event =>
-  dispatch({ type, payload: { event, item } });
+
+const mouseDownEventDispatcher = dispatch => type => item => event => {
+  event.preventDefault();
+  const pos = { x: event.clientX, y: event.clientY };
+  dispatch({ type, payload: { pos, item } });
+};
+
+const touchStartEventDispatcher = dispatch => type => item => event => {
+  event.preventDefault();
+  event.stopPropagation();
+  const numOfCursors = event.touches.length;
+  const pos = {
+    x: event.touches[0].clientX,
+    y: event.touches[0].clientY
+  };
+  const touches = { numOfCursors, pos };
+  dispatch({ type, payload: { touches, item } });
+};
 
 // Hook
 function useCursor() {
@@ -80,19 +96,26 @@ function useCursor() {
   // (e) => eventAction("SOME_ACTION")
   const eventAction = useCallback(eventDispatcher(dispatch), []);
   // (e) => itemEventAction("SOME_ACTION")(index)
-  const itemEventAction = useCallback(itemEventDispatcher(dispatch), []);
+  const mouseDownEventAction = useCallback(
+    mouseDownEventDispatcher(dispatch)("MOUSE_DOWN"),
+    []
+  );
+  const touchStartEventAction = useCallback(
+    touchStartEventDispatcher(dispatch)("TOUCH_START"),
+    []
+  );
   // Item's scope cursor events
   const getDraggableItemEvents = useCallback(
     ({ index, id }) => ({
-      onMouseDown: itemEventAction("MOUSE_DOWN")({ index, id }),
       // onMouseEnter: itemEventAction("MOUSE_ENTER")({ index, id }),
+      onMouseDown: mouseDownEventAction({ index, id }),
+      onTouchStart: touchStartEventAction({ index, id }),
       onDragEnd: eventAction("DRAG_END"),
-      onTouchStart: itemEventAction("TOUCH_START")({ index, id }),
       // onTouchMove: itemEventAction("TOUCH_MOVE")(index),
       onTouchEnd: eventAction("TOUCH_END"),
       onClickCapture: eventAction("CLICK_CAPTURE")
     }),
-    [eventAction, itemEventAction]
+    [eventAction, mouseDownEventAction, touchStartEventAction]
   );
   // Global scope cursor events
   useDocumentEvents({ ...state, eventAction });
