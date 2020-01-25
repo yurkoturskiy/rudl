@@ -19,6 +19,7 @@ import Header from "./components/Header";
 import ItemComponent from "./components/ItemComponent";
 import useResponsiveRef from "./useResponsiveRef";
 import useLayout from "./useLayout";
+import useLoadHandler from "./useLoadHandler/index";
 // Loglevel setup
 var log = require("loglevel");
 log.setLevel("warn");
@@ -28,6 +29,7 @@ log.getLogger("useGrid").setLevel("warn");
 log.getLogger("useItems").setLevel("warn");
 log.getLogger("useBody").setLevel("warn");
 log.getLogger("useLayout").setLevel("trace");
+log.getLogger("useLoadHandler").setLevel("warn");
 log.getLogger("Endline").setLevel("warn");
 
 //////////////////////////////
@@ -83,8 +85,6 @@ function DraggableMasonryLayout(props) {
       }
     }
   });
-  const [onErrorCount, setOnErrorCount] = useState(0);
-  const [onLoadCount, setOnLoadCount] = useState(0);
 
   ////////////
   // Resize //
@@ -149,12 +149,7 @@ function DraggableMasonryLayout(props) {
     });
   }, [items, layout.elements.length]);
 
-  const errorHandler = index => {
-    setOnErrorCount(onErrorCount + 1);
-    console.log("can't load: ", index);
-  };
-
-  const loadHandler = index => setOnLoadCount(onLoadCount + 1);
+  const loadHandler = useLoadHandler();
 
   const renderItems = useMemo(
     () =>
@@ -170,18 +165,18 @@ function DraggableMasonryLayout(props) {
           ghostSourceId={ghost.sourceId}
           ghostIsActive={ghost.isActive}
           loadHandler={loadHandler}
-          errorHandler={errorHandler}
         />
       )),
     [
-      ghost.isActive,
-      ghost.source,
       items,
-      newLayout.units,
       newLayout.isMount,
-      transition,
+      newLayout.units,
+      newLayout.transition,
       transitionDuration,
-      transitionTimingFunction
+      transitionTimingFunction,
+      ghost.sourceId,
+      ghost.isActive,
+      loadHandler
     ]
   );
 

@@ -11,7 +11,6 @@ function ItemComponent({
   transitionTimingFunction,
   ghostIsActive,
   loadHandler,
-  errorHandler,
   onClickCapture
 }) {
   return (
@@ -34,8 +33,8 @@ function ItemComponent({
         visibility: layoutElement && layoutIsMount ? "visible" : "hidden",
         opacity: ghostIsActive && ghostSourceId === item.id ? 0 : 1
       }}
-      onLoad={loadHandler}
-      onError={errorHandler}
+      onLoad={loadHandler.onLoad}
+      onError={loadHandler.onError}
       onClickCapture={onClickCapture}
     >
       {item.element}
@@ -52,8 +51,7 @@ ItemComponent.propTypes = {
   transitionDuration: PropTypes.number,
   transitionTimingFunction: PropTypes.string,
   ghostIsActive: PropTypes.bool,
-  loadHandler: PropTypes.func,
-  errorHandler: PropTypes.func,
+  loadHandler: PropTypes.object,
   onClickCapture: PropTypes.func
 };
 
