@@ -18,6 +18,7 @@ import {
 // Hooks
 import usePress from "./usePress";
 import useDocumentEvents from "./useDocumentEvents";
+import useClickCapture from "./useClickCapture";
 
 const { log } = logger("useCursor");
 
@@ -27,8 +28,6 @@ const reducer = (state, action) => {
     // Mouse
     case "MOUSE_MOVE":
       return mouseMove({ state, ...action.payload });
-    // case "MOUSE_ENTER":
-    //   return state.isDrag ? mouseEnter({ state, ...action.payload }) : state;
     case "MOUSE_DOWN":
       return mouseDown({ state, ...action.payload });
     case "MOUSE_UP":
@@ -107,19 +106,17 @@ function useCursor() {
   // Item's scope cursor events
   const getDraggableItemEvents = useCallback(
     ({ index, id }) => ({
-      // onMouseEnter: itemEventAction("MOUSE_ENTER")({ index, id }),
       onMouseDown: mouseDownEventAction({ index, id }),
       onTouchStart: touchStartEventAction({ index, id }),
       onDragEnd: eventAction("DRAG_END"),
-      // onTouchMove: itemEventAction("TOUCH_MOVE")(index),
-      onTouchEnd: eventAction("TOUCH_END"),
-      onClickCapture: eventAction("CLICK_CAPTURE")
+      onTouchEnd: eventAction("TOUCH_END")
     }),
     [eventAction, mouseDownEventAction, touchStartEventAction]
   );
   // Global scope cursor events
   useDocumentEvents({ ...state, eventAction });
   usePress({ createAction, ...state });
+  useClickCapture({ dragItemId: state.dragItemId, eventAction });
   // Log effect
   useEffect(() => log.debug("useCursor state update", state), [state]);
 
