@@ -11,8 +11,8 @@ function useResponsiveRef(action) {
   const onWidthResize = useCallback(action, [action]);
   const handleResize = useCallback(() => {
     const newWidth = ref.current.offsetWidth;
-    width !== newWidth && onWidthResize(newWidth);
     setWidth(newWidth);
+    width !== newWidth && onWidthResize(newWidth);
   }, [onWidthResize, width]);
 
   useEffect(() => {
