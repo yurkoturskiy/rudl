@@ -9,7 +9,7 @@ First demo: https://rudl.netlify.com/
 
 ## Overview
 
-The main goal of RUDL is to provide seamless transition between different layouts on any change.
+The main goal of RUDL is to create as many states and types of layouts as possible and provide seamless transitions between them.
 
 ## Install
 
