@@ -1,23 +1,43 @@
 module.exports = {
+  parser: "@typescript-eslint/parser", // Specifies the ESLint parser
+  extends: [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier/@typescript-eslint",
+    "plugin:prettier/recommended",
+  ],
+  settings: {
+    react: {
+      version: "detect",
+    },
+  },
   env: {
     browser: true,
-    es6: true
+    node: true,
+    es6: true,
   },
-  extends: "plugin:react/recommended",
-  globals: {
-    Atomics: "readonly",
-    SharedArrayBuffer: "readonly"
-  },
+  plugins: ["@typescript-eslint", "react", "react-hooks"],
   parserOptions: {
     ecmaFeatures: {
-      jsx: true
+      jsx: true,
     },
-    ecmaVersion: 2018,
-    sourceType: "module"
+    ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
+    sourceType: "module", // Allows for the use of imports
   },
-  plugins: ["react", "react-hooks"],
   rules: {
-    "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
-    "react-hooks/exhaustive-deps": "warn" // Checks effect dependencies
-  }
+    "react/prop-types": "off", // Disable prop-types as we use TypeScript for type checking
+    "@typescript-eslint/explicit-function-return-type": "off",
+  },
+  overrides: [
+    // Override some TypeScript rules just for .js files
+    {
+      files: ["*.js"],
+      rules: {
+        "@typescript-eslint/no-var-requires": "off", //
+        "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
+        "react-hooks/exhaustive-deps": "warn", // Checks effect dependencies
+      },
+    },
+  ],
 };
