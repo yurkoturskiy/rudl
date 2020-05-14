@@ -4,7 +4,7 @@
   "description": "React Universal DnD Layout",
   "main": "./build/index.js",
   "scripts": {
-    "build": "webpack"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
