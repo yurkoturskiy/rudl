@@ -1,6 +1,30 @@
 import { pipe, subtract, lt, tryCatch } from "ramda";
 import errorHandler from "../utils/errorHandler";
 
+interface State {
+  isMouse: boolean;
+  isTouch: boolean;
+  isPress: boolean;
+  isLongPress: boolean;
+  isMove: boolean;
+  isDrag: boolean;
+  pos: Pos | null;
+  initialPos: Pos | null;
+  numOfCursors: number | null;
+  // Item scope
+  dragItemId: string | null;
+  dragItemIndex: string | null;
+  dragPoint: Pos | null;
+  overItemId: string | null;
+  overItemIndex: number | null;
+  preventClick?: boolean;
+}
+
+interface Pos {
+  x: number;
+  y: number;
+}
+
 // Delta from initial pos and current pos
 const deltaMT2 = pipe(subtract, Math.abs, lt(2));
 const distanceIsMT2 = (pos, initialPos) =>
@@ -28,30 +52,6 @@ const getElementIdFromPoint = (pos) =>
   document.elementFromPoint(pos.x, pos.y).id;
 const getIdFromPos = (pos: Pos) =>
   tryCatch(getElementIdFromPoint, errorHandler)(pos);
-
-interface Pos {
-  x: number;
-  y: number;
-}
-
-interface State {
-  isMouse: boolean;
-  isTouch: boolean;
-  isPress: boolean;
-  isLongPress: boolean;
-  isMove: boolean;
-  isDrag: boolean;
-  pos: Pos | null;
-  initialPos: Pos | null;
-  numOfCursors: number | null;
-  // Item scope
-  dragItemId: string | null;
-  dragItemIndex: string | null;
-  dragPoint: Pos | null;
-  overItemId: string | null;
-  overItemIndex: number | null;
-  preventClick?: boolean;
-}
 
 export const initState = (state: State) => ({
   ...state,
