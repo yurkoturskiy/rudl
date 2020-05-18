@@ -3,7 +3,7 @@ import React, {
   useRef,
   useState,
   useMemo,
-  useCallback
+  useCallback,
 } from "react";
 import PropTypes from "prop-types";
 // Hooks
@@ -32,6 +32,31 @@ log.getLogger("useLayout").setLevel("warn");
 log.getLogger("useLoadHandler").setLevel("warn");
 log.getLogger("Endline").setLevel("warn");
 
+Rudl.propTypes = {
+  header: PropTypes.element,
+  children: PropTypes.element,
+  reverse: PropTypes.bool,
+  onEndlineEnter: PropTypes.func,
+  onRearrange: PropTypes.func,
+  onWidthResize: PropTypes.func,
+  transitionDuration: PropTypes.number,
+  transitionTimingFunction: PropTypes.string,
+  ghostTransitionDuration: PropTypes.number,
+  ghostTransitionTimingFunction: PropTypes.string,
+};
+
+interface Rudl {
+  transitionTimingFunction: string;
+  transitionDuration: number;
+  ghostTransitionDuration: number;
+  ghostTransitionTimingFunction: string;
+  children: React.PropsWithChildren<object>;
+  header: JSX.Element;
+  onRearrange: Function;
+  onWidthResize: Function;
+  onEndlineEnter: Function;
+}
+
 function Rudl({
   transitionTimingFunction,
   transitionDuration,
@@ -41,8 +66,8 @@ function Rudl({
   onRearrange,
   onWidthResize,
   header,
-  onEndlineEnter
-}) {
+  onEndlineEnter,
+}: Rudl) {
   const [layoutRef, layoutWrapperWidth] = useResponsiveRef(onWidthResize);
   const [cursor, getDraggableItemEvents] = useCursor();
   const { items } = useItems({
@@ -50,11 +75,11 @@ function Rudl({
     getDraggableItemEvents,
     cursor,
     transitionDuration,
-    onRearrange
+    onRearrange,
   });
   const ghost = useGhost(cursor, items, {
     ghostTransitionTimingFunction,
-    ghostTransitionDuration
+    ghostTransitionDuration,
   });
   const body = useBody(cursor);
   const layout = useLayout(layoutWrapperWidth, items);
@@ -85,7 +110,7 @@ function Rudl({
       transitionTimingFunction,
       ghost.sourceId,
       ghost.isActive,
-      loadHandler
+      loadHandler,
     ]
   );
 
@@ -112,24 +137,11 @@ function Rudl({
   );
 }
 
-Rudl.propTypes = {
-  header: PropTypes.element,
-  children: PropTypes.element,
-  reverse: PropTypes.bool,
-  onEndlineEnter: PropTypes.func,
-  onRearrange: PropTypes.func,
-  onWidthResize: PropTypes.func,
-  transitionDuration: PropTypes.number,
-  transitionTimingFunction: PropTypes.string,
-  ghostTransitionDuration: PropTypes.number,
-  ghostTransitionTimingFunction: PropTypes.string
-};
-
 Rudl.defaultProps = {
   transitionDuration: 600,
   transitionTimingFunction: "ease",
   ghostTransitionDuration: 200,
-  ghostTransitionTimingFunction: "ease"
+  ghostTransitionTimingFunction: "ease",
 };
 
 export default Rudl;
