@@ -6,7 +6,7 @@ import Layout from "../layout"
 import SEO from "../seo"
 import Menu from "./Menu"
 
-export default function PageTemplate(props) {
+const PageTemplate: React.FC = props => {
   const { title } = props.data.mdx.frontmatter
   return (
     <Layout path={props.path}>
@@ -34,3 +34,5 @@ export const query = graphql`
     }
   }
 `
+
+export default PageTemplate
