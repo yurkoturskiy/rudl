@@ -26,6 +26,7 @@
     "@babel/core": "^7.10.2",
     "@babel/preset-env": "^7.10.2",
     "@babel/preset-react": "^7.10.1",
+    "@types/mdx-js__react": "^1.5.2",
     "babel-loader": "^8.1.0",
     "eslint": "^6.8.0",
     "eslint-config-standard": "^14.1.1",
