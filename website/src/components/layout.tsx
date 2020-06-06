@@ -10,7 +10,7 @@ import PropTypes from "prop-types"
 import { useStaticQuery, graphql } from "gatsby"
 
 import Header from "./header"
-import "./layout.css"
+import "../styles/layout.css"
 import "../styles/docs.css"
 import "@material/react-fab/dist/fab.css"
 import "@material/react-material-icon/dist/material-icon.css"
