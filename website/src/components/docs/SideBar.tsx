@@ -1,7 +1,16 @@
-import React from "react"
+import React, { CSSProperties } from "react"
 import { Link, useStaticQuery, graphql } from "gatsby"
 
-function SectionWrapper({ item, name, children }) {
+interface SectionWrapperProps {
+  item: any
+  name: string
+}
+
+const SectionWrapper: React.FC<SectionWrapperProps> = ({
+  item,
+  name,
+  children,
+}) => {
   return (
     <div className="section">
       {item && <h2 className="item">{item}</h2>}
@@ -10,7 +19,32 @@ function SectionWrapper({ item, name, children }) {
   )
 }
 
-export default function SideBar(props) {
+interface SideBarProps {
+  sideBarRef: React.RefObject<HTMLDivElement>
+  isVisible: boolean
+}
+
+interface Section {
+  name: string
+  subitems: JSX.Element[]
+  item: JSX.Element | null
+}
+
+interface Edge {
+  node: {
+    id: string
+    frontmatter: {
+      path: string
+      title: string
+      order: number
+      section: string
+      sectionOrder: number
+      unlisted: boolean
+    }
+  }
+}
+
+const SideBar: React.FC<SideBarProps> = props => {
   const { allMdx } = useStaticQuery(graphql`
     query SideBarQuery {
       allMdx(
@@ -35,22 +69,18 @@ export default function SideBar(props) {
       }
     }
   `)
-  var sections = []
-  var names = []
-  var independent = []
-  allMdx.edges.forEach(edge => {
-    const {
-      path,
-      title,
-      section,
-      sectionOrder,
-      order,
-      unlisted,
-    } = edge.node.frontmatter
-    if (!sections[sectionOrder])
-      sections[sectionOrder] = { name: section, subitems: [] }
-    if (order === 0) {
-      let item = (
+
+  const sectionsData: Section[] = allMdx.edges.reduce(
+    (acc: Section[], edge: Edge) => {
+      const {
+        path,
+        title,
+        section,
+        sectionOrder,
+        order,
+        unlisted,
+      } = edge.node.frontmatter
+      const element = (
         <Link
           className="link"
           activeStyle={{ color: "#33e" }}
@@ -59,37 +89,48 @@ export default function SideBar(props) {
           {edge.node.frontmatter.title}
         </Link>
       )
-      sections[sectionOrder].item = item
-    } else {
-      let subitem = (
+      const isNewSection = !!acc[sectionOrder]
+      const isSubitem = order > 0 && !unlisted
+      const item = isSubitem ? acc[sectionOrder].item : element
+      const subitem = (
         <li className="subitem" key={path}>
-          <Link
-            className="link"
-            activeStyle={{ color: "#33e" }}
-            to={edge.node.frontmatter.path}
-          >
-            {edge.node.frontmatter.title}
-          </Link>
+          {element}
         </li>
       )
-      !unlisted && sections[sectionOrder].subitems.push(subitem)
-    }
-  })
-  sections = sections.map(section => (
+      let subitems: JSX.Element[]
+      if (isNewSection && isSubitem) {
+        subitems = [subitem]
+      } else if (isSubitem) {
+        subitems = [...acc[sectionOrder].subitems, subitem]
+      } else {
+        subitems = []
+      }
+      acc[sectionOrder] = { name: section, subitems: subitems, item }
+      return acc
+    },
+    []
+  )
+
+  const sections = sectionsData.map(section => (
     <SectionWrapper name={section.name} item={section.item} key={section.name}>
       <ul className="subitems">{section.subitems}</ul>
     </SectionWrapper>
   ))
+
   return (
     <div
       className="sections"
       ref={props.sideBarRef}
-      style={{
-        display: props.isVisible && "inline",
-        "--sidebar-zindex": props.isVisible ? "6" : "2",
-      }}
+      style={
+        {
+          display: props.isVisible ? "inline" : undefined,
+          "--sidebar-zindex": props.isVisible ? "6" : "2",
+        } as CSSProperties
+      }
     >
       {sections}
     </div>
   )
 }
+
+export default SideBar
