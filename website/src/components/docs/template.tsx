@@ -6,7 +6,19 @@ import Layout from "../layout"
 import SEO from "../seo"
 import Menu from "./Menu"
 
-const PageTemplate: React.FC = props => {
+interface Props {
+  data: {
+    mdx: {
+      frontmatter: {
+        title: string
+      }
+      body: string
+    }
+  }
+  path: string
+}
+
+const PageTemplate: React.FC<Props> = props => {
   const { title } = props.data.mdx.frontmatter
   return (
     <Layout path={props.path}>
