@@ -2,7 +2,17 @@ import React from "react"
 import Fab from "@material/react-fab"
 import MaterialIcon from "@material/react-material-icon"
 
-function SandwichButton({ sandwichBtnRef, isVisible, setIsVisible }) {
+interface Props {
+  sandwichBtnRef: React.RefObject<HTMLDivElement>
+  isVisible: boolean
+  setIsVisible: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const SandwichButton: React.FC<Props> = ({
+  sandwichBtnRef,
+  isVisible,
+  setIsVisible,
+}) => {
   return (
     <div ref={sandwichBtnRef}>
       <Fab
