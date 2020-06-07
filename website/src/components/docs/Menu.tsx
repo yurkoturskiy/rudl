@@ -1,27 +1,23 @@
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect, useCallback } from "react"
 import SideBar from "./SideBar"
 import SandwichButton from "./SandwichButton"
 
-function Menu(props) {
+function Menu() {
   const [isVisible, setIsVisible] = useState(false)
-  const sandwichBtnRef = useRef()
-  const sideBarRef = useRef()
+  const sandwichBtnRef = useRef<HTMLDivElement>(null)
+  const sideBarRef = useRef<HTMLDivElement>(null)
 
-  const handleClickOutside = event => {
+  const handleClickOutside = useCallback((event: Event) => {
     // Collapse on click outside of the menu
     if (
       sandwichBtnRef.current &&
-      !sandwichBtnRef.current.contains(event.target) &&
-      !sideBarRef.current.contains(event.target)
+      !sandwichBtnRef.current.contains(event.target as Node) &&
+      sideBarRef.current &&
+      !sideBarRef.current.contains(event.target as Node)
     ) {
       setIsVisible(false)
     }
-  }
-
-  const handleMenuClick = () => {
-    // Collapse on menu element click
-    setIsVisible(false)
-  }
+  }, [])
 
   useEffect(() => {
     if (isVisible) {
@@ -32,9 +28,9 @@ function Menu(props) {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [isVisible])
+  }, [isVisible, handleClickOutside])
   return (
-    <div style={{ zIndex: isVisible && "8" }}>
+    <div style={{ zIndex: isVisible ? 8 : undefined }}>
       <SideBar sideBarRef={sideBarRef} isVisible={isVisible} />
       <SandwichButton
         sandwichBtnRef={sandwichBtnRef}
