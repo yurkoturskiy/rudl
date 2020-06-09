@@ -1,9 +1,6 @@
 import React from "react"
-import { Link } from "gatsby"
-import Header from "../components/DesignSystem/Header"
 import Text from "../components/DesignSystem/Text"
 import Box from "../components/DesignSystem/Box"
-import Flex from "../components/DesignSystem/Flex"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
