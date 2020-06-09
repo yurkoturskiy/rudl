@@ -1,13 +1,27 @@
 import React from "react"
 import { Link } from "gatsby"
+import Header from "../components/DesignSystem/Header"
+import Text from "../components/DesignSystem/Text"
+import Box from "../components/DesignSystem/Box"
+import Flex from "../components/DesignSystem/Flex"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
+import Button from "../components/DesignSystem/Button"
 
 const IndexPage = () => (
   <Layout>
     <SEO title="Home" />
-    <h1>Hi people</h1>
+    <Box m="0px auto 20px" maxWidth={600} style={{ outline: "1px solid red" }}>
+      <Text as="h1" color="red" textAlign="center">
+        Seamless Draggable Layout
+      </Text>
+      <Text as="p" textAlign="center">
+        The best way to organize content
+      </Text>
+      <Button>Get Started</Button>
+      <Button>Watch Video</Button>
+    </Box>
   </Layout>
 )
 
