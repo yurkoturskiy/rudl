@@ -1,4 +1,4 @@
-import { Link as GLink } from "gatsby"
+import { Link as GLink, GatsbyLinkProps } from "gatsby"
 import styled from "styled-components"
 import {
   color,
@@ -13,13 +13,13 @@ interface Props {
   textDecoration: string
 }
 
-type TextProps = TypographyProps & ColorProps & Props
+type LinkProps = TypographyProps & ColorProps & SpaceProps & Props
 
-const Text = styled<any>(GLink)`
+const Link = styled<any>(GLink)`
   text-decoration: ${(props: Props) => props.textDecoration};
   ${color}
   ${typography}
   ${space}
 `
 
-export default Text
+export default Link
