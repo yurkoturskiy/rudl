@@ -6,6 +6,8 @@
  */
 
 import React from "react"
+import { ThemeProvider } from "styled-components"
+import theme from "./theme"
 
 import "../styles/layout.css"
 import "@material/react-fab/dist/fab.css"
@@ -16,10 +18,10 @@ interface Props {}
 
 const Layout: React.FC<Props> = ({ children }) => {
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <Header />
       <main>{children}</main>
-    </>
+    </ThemeProvider>
   )
 }
 
