@@ -5,6 +5,9 @@ import MDXRenderer from "gatsby-plugin-mdx/mdx-renderer"
 import Layout from "../layout"
 import SEO from "../seo"
 import Menu from "./Menu"
+import "./styles.css"
+import Flex from "../DesignSystem/Flex"
+import Box from "../DesignSystem/Box"
 
 interface Props {
   data: {
@@ -21,16 +24,19 @@ interface Props {
 const PageTemplate: React.FC<Props> = props => {
   const { title } = props.data.mdx.frontmatter
   return (
-    <Layout path={props.path}>
+    <Layout>
       <SEO title={title} />
-      <div className="docs">
+      <Flex
+        width={["auto", "auto", "auto", 960, 960]}
+        mx={["12px", "24px", "24px", "auto"]}
+      >
         <Menu />
-        <div className="content">
+        <Box width={[1, 1, 1, 768]}>
           <MDXProvider>
             <MDXRenderer>{props.data.mdx.body}</MDXRenderer>
           </MDXProvider>
-        </div>
-      </div>
+        </Box>
+      </Flex>
     </Layout>
   )
 }
