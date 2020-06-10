@@ -1,36 +1,18 @@
 import React from "react";
-
-const getSeparator = ({ child, index }) => ({
-  // Separator is something like header or title
-  index: index,
-  id: child.key,
-  order: child.props.order,
-  isSeparator: child.props.isSeparator,
-  element: child
-});
-
-const getItem = ({ child, index, getDraggableItemEvents }) => ({
-  // Item is just a regular layout unit
-  index: index,
-  id: child.key,
-  order: child.props.order,
-  isSeparator: child.props.isSeparator,
-  width: child.props.width,
-  height: child.props.height,
-  element: React.cloneElement(child, {
-    ...child.props,
-    draggableItem: getDraggableItemEvents({ index, id: child.key })
-  })
-});
-
-const initItem = getDraggableItemEvents => (child, index) =>
-  // Generate one item or separator
-  child.props.isSeparator
-    ? getSeparator({ child, index })
-    : getItem({ child, index, getDraggableItemEvents });
+import initItem, { ItemType } from "./initItem";
 
 const getListOfItems = ({ children, getDraggableItemEvents }) =>
   React.Children.map(children, initItem(getDraggableItemEvents));
+
+interface State {
+  dragItemId: string;
+  dragItemIndex: number;
+  overItemId: string;
+  overItemIndex: number;
+  dragItemPrevOrder: number;
+  dragItemNewOrder: number;
+  isRearranges: boolean;
+}
 
 export default ({ state, children, getDraggableItemEvents, ...initArgs }) => ({
   ...state,
@@ -45,7 +27,7 @@ export default ({ state, children, getDraggableItemEvents, ...initArgs }) => ({
   setOverItem: null,
   items: getListOfItems({ children, getDraggableItemEvents }),
   // Methods
-  getFirstItem: function() {
-    return this.items.find(item => !item.isSeparator);
-  }
+  getFirstItem: function () {
+    return this.items.find((item: ItemType) => !item.isSeparator);
+  },
 });
