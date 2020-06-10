@@ -1,13 +1,21 @@
 import React from "react";
-import PropTypes from "prop-types";
 
-const Ghost = ({
+interface Props {
+  pos: { x: string; y: string };
+  isTransit: boolean;
+  transDur: number;
+  transTFunc: string;
+  kernel: JSX.Element;
+  onTransitionEnd(e: React.TransitionEvent): void;
+}
+
+const Ghost: React.FC<Props> = ({
   pos,
   isTransit,
   kernel,
   transDur,
   transTFunc,
-  onTransitionEnd
+  onTransitionEnd,
 }) => {
   const transition = isTransit
     ? `left ${transDur}ms ${transTFunc}, top ${transDur}ms ${transTFunc}`
@@ -20,23 +28,13 @@ const Ghost = ({
         left: pos.x,
         top: pos.y,
         pointerEvents: "none",
-        transition
+        transition,
       }}
       onTransitionEnd={onTransitionEnd}
     >
       {kernel}
     </div>
   );
-};
-
-Ghost.propTypes = {
-  pos: PropTypes.object,
-  y: PropTypes.number,
-  isTransit: PropTypes.bool,
-  transDur: PropTypes.number,
-  transTFunc: PropTypes.string,
-  onTransitionEnd: PropTypes.func,
-  kernel: PropTypes.element
 };
 
 export default Ghost;
