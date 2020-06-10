@@ -1,23 +1,37 @@
 import React, { useRef, useEffect, useCallback, useReducer } from "react";
 import { curry, pipe } from "ramda";
-import PropTypes from "prop-types";
 import createAction from "../utils/createAction";
 import logger from "../utils/logger";
 
 const { log } = logger("Endline");
 
+interface State {
+  endlineDistanceToTop: number;
+  endlineDistanceToViewport: number;
+  lastTriggeredNumOfItems: number;
+}
+
 const createReferencedAction = curry((dispatch, ref, type, event) =>
   dispatch({ type, payload: { ref, event } })
 );
 
-const setEndlineDistanceToTop = ({ state, ref, event }) => ({
-  ...state,
-  endlineDistanceToTop: ref.current.getBoundingClientRect().top
-});
+const setEndlineDistanceToTop = ({
+  state,
+  ref,
+}: {
+  state: State;
+  ref: React.RefObject<HTMLDivElement>;
+}): State => {
+  const element = ref.current as HTMLDivElement;
+  return {
+    ...state,
+    endlineDistanceToTop: element.getBoundingClientRect().top,
+  };
+};
 
-const setEndlineDistanceToViewport = state => ({
+const setEndlineDistanceToViewport = (state: State): State => ({
   ...state,
-  endlineDistanceToViewport: state.endlineDistanceToTop - window.innerHeight
+  endlineDistanceToViewport: state.endlineDistanceToTop - window.innerHeight,
 });
 
 const handleScroll = pipe(
@@ -25,19 +39,36 @@ const handleScroll = pipe(
   setEndlineDistanceToViewport
 );
 
-const endlineEnter = ({ state, onEndlineEnter, numOfLoadedItems }) => {
+const endlineEnter = ({
+  state,
+  onEndlineEnter,
+  numOfLoadedItems,
+}: {
+  state: State;
+  onEndlineEnter(): void;
+  numOfLoadedItems: number;
+}): State => {
   onEndlineEnter();
   return { ...state, lastTriggeredNumOfItems: numOfLoadedItems };
 };
 
-const initState = ({ state } = {}) => ({
+const initialStateValues: State = {
+  endlineDistanceToTop: Infinity,
+  endlineDistanceToViewport: Infinity,
+  lastTriggeredNumOfItems: 0,
+};
+
+const initState = ({ state }: { state?: State } = {}) => ({
   ...state,
-  endlineDistanceToTop: undefined,
-  endlineDistanceToViewport: undefined,
-  lastTriggeredNumOfItems: undefined
+  ...initialStateValues,
 });
 
-const reducer = (state, action) => {
+interface Action {
+  type: string;
+  payload: any;
+}
+
+const reducer = (state: State, action: Action) => {
   log.debug("Endline reducer", action.type, state, action.payload);
   switch (action.type) {
     case "SCROLL":
@@ -49,14 +80,31 @@ const reducer = (state, action) => {
   }
 };
 
-function Endline({ layout, onEndlineEnter }) {
-  const [state, dispatch] = useReducer(reducer, {}, initState);
+interface Layout {
+  numOfItems: number;
+  isMount: boolean;
+  endlineStartX: number;
+  endlineStartY: number;
+  endlineEndX: number;
+  endlineEndY: number;
+}
+
+interface Props {
+  layout: Layout;
+  onEndlineEnter(): void;
+}
+
+const Endline: React.FC<Props> = ({ layout, onEndlineEnter }) => {
+  const endlineStartRef = useRef<HTMLDivElement>(null); // Endline start sensor
+  const endlineEndRef = useRef<HTMLDivElement>(null); // Endline end sensor
+  const [state, dispatch] = useReducer(reducer, initialStateValues);
   const handleScrollEvent = useCallback(
     createReferencedAction(dispatch, endlineStartRef, "SCROLL"),
     []
   );
   const handleEnlineEnter = useCallback(
-    createAction(dispatch, "ENDLINE_ENTER")
+    createAction(dispatch, "ENDLINE_ENTER"),
+    []
   );
 
   // Endline enter event
@@ -65,7 +113,7 @@ function Endline({ layout, onEndlineEnter }) {
       state.lastTriggeredNumOfItems !== layout.numOfItems &&
       handleEnlineEnter({
         onEndlineEnter,
-        numOfLoadedItems: layout.numOfItems
+        numOfLoadedItems: layout.numOfItems,
       });
   }, [handleEnlineEnter, layout.numOfItems, onEndlineEnter, state]);
 
@@ -81,8 +129,6 @@ function Endline({ layout, onEndlineEnter }) {
   useEffect(() => log.debug("Endline state update", state), [state]);
 
   // Render's values
-  const endlineStartRef = useRef(); // Endline start sensor
-  const endlineEndRef = useRef(); // Endline end sensor
   const startX = layout.endlineStartX;
   const startY = layout.endlineStartY;
   const endX = layout.endlineEndX;
@@ -96,7 +142,7 @@ function Endline({ layout, onEndlineEnter }) {
         style={{
           position: "absolute",
           top: `${startY}px`,
-          left: `${startX}px`
+          left: `${startX}px`,
         }}
       />
       <div
@@ -105,16 +151,11 @@ function Endline({ layout, onEndlineEnter }) {
         style={{
           position: "absolute",
           top: `${endY}px`,
-          left: `${endX}px`
+          left: `${endX}px`,
         }}
       />
     </>
   );
-}
-
-Endline.propTypes = {
-  layout: PropTypes.object,
-  onEndlineEnter: PropTypes.func
 };
 
 export default Endline;
