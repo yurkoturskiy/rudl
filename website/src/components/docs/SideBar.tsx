@@ -89,7 +89,7 @@ const SideBar: React.FC<SideBarProps> = props => {
       } else {
         subitems = []
       }
-      acc[sectionOrder] = { name: section, subitems: subitems, item }
+      acc[sectionOrder] = { name: section, subitems, item }
       return acc
     },
     []
@@ -102,18 +102,20 @@ const SideBar: React.FC<SideBarProps> = props => {
   ))
 
   return (
-    <div
+    <Box
       className="sections"
+      display={["none", "none", "none", "block"]}
+      position={["fixed", "fixed", "fixed", "inherit"]}
+      zIndex={[6, 6, 6, 2]}
+      bg="white"
+      width={192}
       ref={props.sideBarRef}
-      style={
-        {
-          display: props.isVisible ? "inline" : undefined,
-          "--sidebar-zindex": props.isVisible ? "6" : "2",
-        } as CSSProperties
-      }
+      style={{
+        display: props.isVisible ? "inline" : undefined,
+      }}
     >
       {sections}
-    </div>
+    </Box>
   )
 }
 
