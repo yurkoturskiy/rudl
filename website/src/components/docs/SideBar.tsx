@@ -1,23 +1,7 @@
 import React, { CSSProperties } from "react"
 import { Link, useStaticQuery, graphql } from "gatsby"
-
-interface SectionWrapperProps {
-  item: any
-  name: string
-}
-
-const SectionWrapper: React.FC<SectionWrapperProps> = ({
-  item,
-  name,
-  children,
-}) => {
-  return (
-    <div className="section">
-      {item && <h2 className="item">{item}</h2>}
-      {children}
-    </div>
-  )
-}
+import Section from "./Section"
+import Box from "../DesignSystem/Box"
 
 interface SideBarProps {
   sideBarRef: React.RefObject<HTMLDivElement>
@@ -112,9 +96,9 @@ const SideBar: React.FC<SideBarProps> = props => {
   )
 
   const sections = sectionsData.map(section => (
-    <SectionWrapper name={section.name} item={section.item} key={section.name}>
+    <Section name={section.name} item={section.item} key={section.name}>
       <ul className="subitems">{section.subitems}</ul>
-    </SectionWrapper>
+    </Section>
   ))
 
   return (
