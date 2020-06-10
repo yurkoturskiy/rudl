@@ -1,14 +1,22 @@
 import React from "react";
-import PropTypes from "prop-types";
 
-const BoundryBox = ({
+interface Props {
+  width: number;
+  height: number;
+  transition: boolean;
+  layoutIsMount: boolean;
+  transitionDuration: number;
+  transitionTimingFunction: string;
+}
+
+const BoundryBox: React.FC<Props> = ({
   width,
   height,
   transition,
   layoutIsMount,
   transitionDuration,
   transitionTimingFunction,
-  children
+  children,
 }) => (
   <div
     style={{
@@ -20,22 +28,12 @@ const BoundryBox = ({
       transition:
         transition && layoutIsMount
           ? `width ${transitionDuration}ms ${transitionTimingFunction}`
-          : "none"
+          : "none",
     }}
     className="boundry-box"
   >
     {children}
   </div>
 );
-
-BoundryBox.propTypes = {
-  width: PropTypes.number,
-  height: PropTypes.number,
-  transition: PropTypes.bool,
-  layoutIsMount: PropTypes.bool,
-  transitionDuration: PropTypes.number,
-  transitionTimingFunction: PropTypes.string,
-  children: PropTypes.element
-};
 
 export default BoundryBox;
