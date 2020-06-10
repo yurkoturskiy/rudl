@@ -1,6 +1,7 @@
 import React from "react"
 import Fab from "@material/react-fab"
 import MaterialIcon from "@material/react-material-icon"
+import Fixed from "../DesignSystem/Fixed"
 
 interface Props {
   sandwichBtnRef: React.RefObject<HTMLDivElement>
@@ -15,8 +16,11 @@ const SandwichButton: React.FC<Props> = ({
 }) => {
   return (
     <div ref={sandwichBtnRef}>
-      <Fab
-        className="sandwich-button"
+      <Fixed
+        as={Fab}
+        display={["inherit", "inherit", "inherit", "none"]}
+        right="32px"
+        bottom="32px"
         icon={<MaterialIcon icon={isVisible ? "close" : "menu"} />}
         onClick={() => setIsVisible(!isVisible)}
       />
