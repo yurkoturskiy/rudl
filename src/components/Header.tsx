@@ -1,23 +1,22 @@
 import React from "react";
-import PropTypes from "prop-types";
 
-function Header({ width, component }) {
+interface Props {
+  width: number;
+  component: JSX.Element;
+}
+
+const Header: React.FC<Props> = ({ width, component }) => {
   return (
     <div
       style={{
         position: "relative",
         width: `${width}px`,
-        margin: "0 auto 0 auto"
+        margin: "0 auto 0 auto",
       }}
     >
       {component}
     </div>
   );
-}
-
-Header.propTypes = {
-  component: PropTypes.element,
-  width: PropTypes.number
 };
 
 export default Header;
