@@ -1,8 +1,11 @@
 import React from "react";
 import initItem, { ItemType } from "./initItem";
+import { GetDraggableItemEventsTypes } from "../useCursor";
 
-const getListOfItems = ({ children, getDraggableItemEvents }) =>
-  React.Children.map(children, initItem(getDraggableItemEvents));
+const getListOfItems = (
+  children: React.ReactElement[],
+  getDraggableItemEvents: GetDraggableItemEventsTypes
+): ItemType[] => React.Children.map(children, initItem(getDraggableItemEvents));
 
 interface State {
   dragItemId: string;
@@ -25,7 +28,7 @@ export default ({ state, children, getDraggableItemEvents, ...initArgs }) => ({
   dragItemNewOrder: null,
   isRearranges: false,
   setOverItem: null,
-  items: getListOfItems({ children, getDraggableItemEvents }),
+  items: getListOfItems(children, getDraggableItemEvents),
   // Methods
   getFirstItem: function () {
     return this.items.find((item: ItemType) => !item.isSeparator);

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useReducer, useCallback } from "react";
 import reorder from "./reorder";
-import init from "./init";
+import initState from "./initState";
 import logger from "../utils/logger";
 import checkOverItem from "./checkOverItem";
 import { type } from "ramda";
@@ -10,7 +10,7 @@ const reducer = (state, action) => {
   log.debug("useItems reducer", action.type, state, action.payload);
   switch (action.type) {
     case "UPDATE":
-      return init({ state, ...action.payload });
+      return initState({ state, ...action.payload });
     case "CHECK_OVER_ITEM":
       return checkOverItem({ state, ...action.payload });
     case "REORDER":
@@ -34,7 +34,7 @@ function useItems({
   onRearrange
 }) {
   const [state, dispatch] = useReducer(reducer, [], () =>
-    init({
+    initState({
       children,
       getDraggableItemEvents,
       transitionDuration,
