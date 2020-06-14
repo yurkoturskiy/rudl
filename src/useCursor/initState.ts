@@ -15,6 +15,7 @@ export interface CursorState {
   overItemId: string | null;
   overItemIndex: number | null;
   preventClick?: boolean;
+  setOverItem?: (payload: any) => void;
 }
 
 export interface Pos {
