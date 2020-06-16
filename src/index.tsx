@@ -1,11 +1,4 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useMemo,
-  useCallback,
-} from "react";
-import PropTypes from "prop-types";
+import React, { useMemo } from "react";
 // Hooks
 import useCursor from "./useCursor/index";
 import useItems from "./useItems/index";
@@ -20,6 +13,7 @@ import ItemComponent from "./components/ItemComponent";
 import useResponsiveRef from "./useResponsiveRef";
 import useLayout from "./useLayout";
 import useLoadHandler from "./useLoadHandler/index";
+import { ItemType } from "./useItems/initItem";
 // Loglevel setup
 var log = require("loglevel");
 log.setLevel("warn");
@@ -32,32 +26,19 @@ log.getLogger("useLayout").setLevel("warn");
 log.getLogger("useLoadHandler").setLevel("warn");
 log.getLogger("Endline").setLevel("warn");
 
-Rudl.propTypes = {
-  header: PropTypes.element,
-  children: PropTypes.element,
-  reverse: PropTypes.bool,
-  onEndlineEnter: PropTypes.func,
-  onRearrange: PropTypes.func,
-  onWidthResize: PropTypes.func,
-  transitionDuration: PropTypes.number,
-  transitionTimingFunction: PropTypes.string,
-  ghostTransitionDuration: PropTypes.number,
-  ghostTransitionTimingFunction: PropTypes.string,
-};
-
-interface Rudl {
+interface Props {
   transitionTimingFunction: string;
   transitionDuration: number;
   ghostTransitionDuration: number;
   ghostTransitionTimingFunction: string;
-  children: React.PropsWithChildren<object>;
   header: JSX.Element;
+  reverse: boolean;
   onRearrange: Function;
-  onWidthResize: Function;
-  onEndlineEnter: Function;
+  onWidthResize(newWidth: number): void;
+  onEndlineEnter(): void;
 }
 
-function Rudl({
+const Rudl: React.FC<Props> = ({
   transitionTimingFunction,
   transitionDuration,
   ghostTransitionDuration,
@@ -67,7 +48,7 @@ function Rudl({
   onWidthResize,
   header,
   onEndlineEnter,
-}: Rudl) {
+}) => {
   const [layoutRef, layoutWrapperWidth] = useResponsiveRef(onWidthResize);
   const [cursor, getDraggableItemEvents] = useCursor();
   const { items } = useItems({
@@ -87,7 +68,7 @@ function Rudl({
 
   const renderItems = useMemo(
     () =>
-      items.map((item, index) => (
+      items.map((item: ItemType, index: number) => (
         <ItemComponent
           item={item}
           key={`${item.id}-wrapper`}
@@ -135,7 +116,7 @@ function Rudl({
       </BoundryBox>
     </div>
   );
-}
+};
 
 Rudl.defaultProps = {
   transitionDuration: 600,
