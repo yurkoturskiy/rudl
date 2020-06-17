@@ -1,26 +1,35 @@
 import { pipe, subtract, lt, tryCatch } from "ramda";
 import errorHandler from "../utils/errorHandler";
 import { CursorState as State, Pos } from "./initState";
+import { ItemIdType } from "../useItems/initItem";
 
 // Delta from initial pos and current pos
 const deltaMT2 = pipe(subtract, Math.abs, lt(2));
-const distanceIsMT2 = (pos, initialPos) =>
+const distanceIsMT2 = (pos: Pos, initialPos: Pos): number =>
   deltaMT2(pos.x, initialPos.x) || deltaMT2(pos.y, initialPos.y);
 
+const getWrapperElementFromItemId = (
+  dragItemId: ItemIdType
+) => (): HTMLElement | null => document.getElementById(`${dragItemId}-wrapper`);
 // Initial Cursor Point
-const getRectFromItemId = (dragItemId) => () =>
-  document.getElementById(`${dragItemId}-wrapper`).getBoundingClientRect();
-const calcItemInitPointFromPos = (pos) => (rect) => ({
+const getRectFromElement = (element: HTMLElement): DOMRect =>
+  element.getBoundingClientRect();
+const calcItemInitPointFromPos = (pos: Pos) => (rect: DOMRect): Pos => ({
   x: pos.x - rect.left,
   y: pos.y - rect.top,
 });
-const roundPos = (pos) => ({
+const roundPos = (pos: Pos): Pos => ({
   x: Math.round(pos.x),
   y: Math.round(pos.y),
 });
 
-const calcItemInitPoint = (pos, dragItemId) =>
-  pipe(getRectFromItemId(dragItemId), calcItemInitPointFromPos(pos), roundPos);
+const calcItemInitPoint = (pos: Pos, dragItemId: ItemIdType) =>
+  pipe(
+    getWrapperElementFromItemId(dragItemId),
+    getRectFromElement,
+    calcItemInitPointFromPos(pos),
+    roundPos
+  );
 
 const tryCalcItemInitPoint = (pos, dragItemId) =>
   tryCatch(calcItemInitPoint(pos, dragItemId), errorHandler)();
