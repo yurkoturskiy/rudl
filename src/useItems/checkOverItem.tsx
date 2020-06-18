@@ -1,8 +1,23 @@
 import { pipe } from "ramda";
+import { ItemsState } from "./initState";
+import { ItemIdType, ItemType } from "./initItem";
 
-const findItemById = (items, id) => items.find(item => item.id === id);
-const getIndexFromItem = item => (item ? item.index : null);
+const findItemById = (
+  items: ItemType[],
+  id: ItemIdType
+): ItemType | undefined => items.find((item) => item.id === id);
+const getIndexFromItem = (item: ItemType): number | null =>
+  item ? item.index : null;
 const getIndexFromId = pipe(findItemById, getIndexFromItem);
+
+interface Props {
+  state: ItemsState;
+  overItemIndex: number;
+  overItemId: ItemIdType;
+  dragItemIndex: number;
+  dragItemId: ItemIdType;
+  setOverItem(val: null): void;
+}
 
 const checkOverItem = ({
   state,
@@ -10,14 +25,14 @@ const checkOverItem = ({
   overItemId,
   dragItemIndex,
   dragItemId,
-  setOverItem
-}) => ({
+  setOverItem,
+}: Props): ItemsState => ({
   ...state,
   overItemId,
   overItemIndex: overItemIndex || getIndexFromId(state.items, overItemId),
   dragItemId,
   dragItemIndex,
-  setOverItem
+  setOverItem,
 });
 
 export default checkOverItem;
