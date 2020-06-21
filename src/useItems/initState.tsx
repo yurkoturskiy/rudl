@@ -1,5 +1,5 @@
 import React from "react";
-import initItem, { ItemType } from "./initItem";
+import initItem, { ItemType, ItemIdType } from "./initItem";
 import { GetDraggableItemEventsTypes } from "../useCursor";
 
 const getListOfItems = (
@@ -7,17 +7,35 @@ const getListOfItems = (
   getDraggableItemEvents: GetDraggableItemEventsTypes
 ): ItemType[] => React.Children.map(children, initItem(getDraggableItemEvents));
 
-interface State {
-  dragItemId: string;
-  dragItemIndex: number;
-  overItemId: string;
-  overItemIndex: number;
-  dragItemPrevOrder: number;
-  dragItemNewOrder: number;
+export interface ItemsState {
+  dragItemId: ItemIdType;
+  dragItemIndex: number | null;
+  overItemId: ItemIdType;
+  overItemIndex: number | null;
+  dragItemPrevOrder: number | null;
+  dragItemNewOrder: number | null;
   isRearranges: boolean;
+  setOverItem: (val: null) => void | null;
+  items: ItemType[];
+  getFirstItem: () => ItemType | undefined;
+  transitionDuration?: number;
+  onRearrange?(): void;
 }
 
-export default ({ state, children, getDraggableItemEvents, ...initArgs }) => ({
+interface InitState {
+  state: ItemsState;
+  children: React.ReactElement[];
+  getDraggableItemEvents: GetDraggableItemEventsTypes;
+  transitionDuration?: number;
+  onRearrange?: () => void;
+}
+
+export default ({
+  state,
+  children,
+  getDraggableItemEvents,
+  ...initArgs
+}: InitState): ItemsState => ({
   ...state,
   ...initArgs,
   dragItemId: null,
