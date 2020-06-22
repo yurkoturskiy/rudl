@@ -2,7 +2,6 @@ import React, { useReducer, useEffect, useCallback } from "react";
 import logger from "../utils/logger";
 // Event handlers
 import {
-  initState,
   // Mouse
   mouseMove,
   mouseEnter,
@@ -13,16 +12,28 @@ import {
   touchMove,
   // Gestures
   press,
-  longPress
+  longPress,
 } from "./reducerEventsHandlers";
+import { initState, CursorState } from "./initState";
 // Hooks
 import usePress from "./usePress";
 import useDocumentEvents from "./useDocumentEvents";
 import useClickCapture from "./useClickCapture";
+import { ItemIdType, ItemType } from "../useItems/initItem";
 
 const { log } = logger("useCursor");
 
-const reducer = (state, action) => {
+interface Action {
+  type: string;
+  payload: any;
+}
+
+export type GetDraggableItemEventsTypes = (
+  index: number,
+  id: ItemIdType
+) => DraggableItemEvents;
+
+const reducer = (state: CursorState, action: Action): CursorState => {
   log.debug("useCursor reducer", action.type, state, action.payload);
   switch (action.type) {
     // Mouse
@@ -55,7 +66,7 @@ const reducer = (state, action) => {
       return {
         ...state,
         overItemIndex: action.payload,
-        overItemId: action.payload
+        overItemId: action.payload,
       };
     default:
       return state;
@@ -63,28 +74,41 @@ const reducer = (state, action) => {
 };
 
 // Reducer's action factories
-const createDispatcher = dispatch => type => payload =>
-  dispatch({ type, payload });
-const eventDispatcher = dispatch => type => event =>
-  dispatch({ type, payload: { event } });
+const createDispatcher = (dispatch: React.Dispatch<Action>) => (
+  type: string
+) => (payload: any) => dispatch({ type, payload });
+const eventDispatcher = (dispatch: React.Dispatch<Action>) => (
+  type: string
+) => (event: Event) => dispatch({ type, payload: { event } });
 
-const mouseDownEventDispatcher = dispatch => type => item => event => {
+const mouseDownEventDispatcher = (dispatch: React.Dispatch<Action>) => (
+  type: string
+) => (index: number, id: ItemIdType) => (event: MouseEvent) => {
   event.preventDefault();
   const pos = { x: event.clientX, y: event.clientY };
-  dispatch({ type, payload: { pos, item } });
+  dispatch({ type, payload: { pos, index, id } });
 };
 
-const touchStartEventDispatcher = dispatch => type => item => event => {
+const touchStartEventDispatcher = (dispatch: React.Dispatch<Action>) => (
+  type: string
+) => (index: number, id: ItemIdType) => (event: Event) => {
   event.preventDefault();
   event.stopPropagation();
   const numOfCursors = event.touches.length;
   const pos = {
     x: event.touches[0].clientX,
-    y: event.touches[0].clientY
+    y: event.touches[0].clientY,
   };
   const touches = { numOfCursors, pos };
-  dispatch({ type, payload: { touches, item } });
+  dispatch({ type, payload: { touches, index, id } });
 };
+
+export interface DraggableItemEvents {
+  onMouseDown(event: MouseEvent): void;
+  onTouchStart(event: Event): void;
+  onDragEnd(event: Event): void;
+  onTouchEnd(event: Event): void;
+}
 
 // Hook
 function useCursor() {
@@ -104,12 +128,12 @@ function useCursor() {
     []
   );
   // Item's scope cursor events
-  const getDraggableItemEvents = useCallback(
-    ({ index, id }) => ({
-      onMouseDown: mouseDownEventAction({ index, id }),
-      onTouchStart: touchStartEventAction({ index, id }),
+  const getDraggableItemEvents: GetDraggableItemEventsTypes = useCallback(
+    (index: number, id: ItemIdType): DraggableItemEvents => ({
+      onMouseDown: mouseDownEventAction(index, id),
+      onTouchStart: touchStartEventAction(index, id),
       onDragEnd: eventAction("DRAG_END"),
-      onTouchEnd: eventAction("TOUCH_END")
+      onTouchEnd: eventAction("TOUCH_END"),
     }),
     [eventAction, mouseDownEventAction, touchStartEventAction]
   );
