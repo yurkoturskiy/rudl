@@ -4,6 +4,8 @@ import initState from "./initState";
 import logger from "../utils/logger";
 import checkOverItem from "./checkOverItem";
 import { type } from "ramda";
+import { DraggableItemEvents } from "../useCursor";
+import { CursorState } from "../useCursor/initState";
 const { log } = logger("useItems");
 
 const reducer = (state, action) => {
@@ -23,22 +25,30 @@ const reducer = (state, action) => {
   }
 };
 
-const createDispatcher = dispatch => type => payload =>
+const createDispatcher = (dispatch) => (type) => (payload) =>
   dispatch({ type, payload });
+
+interface Props {
+  children: React.ReactElement[];
+  getDraggableItemEvents: GetDraggableItemEventsTypes;
+  cursor: CursorState;
+  transitionDuration: number;
+  onRearrange(): void;
+}
 
 function useItems({
   children,
   getDraggableItemEvents,
   cursor,
   transitionDuration,
-  onRearrange
-}) {
+  onRearrange,
+}: Props) {
   const [state, dispatch] = useReducer(reducer, [], () =>
     initState({
       children,
       getDraggableItemEvents,
       transitionDuration,
-      onRearrange
+      onRearrange,
     })
   );
   // Actions from template
@@ -53,7 +63,7 @@ function useItems({
     children,
     getDraggableItemEvents,
     transitionDuration,
-    onRearrange
+    onRearrange,
   ]);
 
   // Validate cursor items
@@ -68,7 +78,7 @@ function useItems({
         dragItemIndex: cursor.dragItemIndex,
         overItemId: cursor.overItemId,
         overItemIndex: cursor.overItemIndex,
-        setOverItem: cursor.setOverItem
+        setOverItem: cursor.setOverItem,
       });
   }, [
     checkOverItem,
@@ -78,7 +88,7 @@ function useItems({
     cursor.overItemId,
     cursor.overItemIndex,
     cursor.setOverItem,
-    state.isRearranges
+    state.isRearranges,
   ]);
 
   // Reorder on drag
