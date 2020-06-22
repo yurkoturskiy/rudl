@@ -1,11 +1,12 @@
 import { pipe, map } from "ramda";
 import logger from "../utils/logger";
+import { ItemType } from "./initItem";
 const { trace } = logger("useItems");
 
-const assignNewOrder = ([
-  dragItemPrevOrder = 1,
-  dragItemNewOrder = 0
-]) => item => {
+const assignNewOrder = ([dragItemPrevOrder = 1, dragItemNewOrder = 0]: [
+  number,
+  number
+]) => (item: ItemType) => {
   let { order } = item; // Item is out of range. Keep same order
 
   // Override for items need to be changed
@@ -29,24 +30,27 @@ const assignNewOrder = ([
   return { ...item, order };
 };
 
-const updateDragItemOrders = state => ({
+const updateDragItemOrders = (state) => ({
   ...state,
   dragItemPrevOrder: state.items[state.dragItemIndex].order,
-  dragItemNewOrder: state.items[state.overItemIndex].order
+  dragItemNewOrder: state.items[state.overItemIndex].order,
 });
 
-const rearrangeItems = fn => state => ({
+const rearrangeItems = (fn) => (state) => ({
   ...state,
   isRearranges: true,
-  items: map(fn([state.dragItemPrevOrder, state.dragItemNewOrder]), state.items)
+  items: map(
+    fn([state.dragItemPrevOrder, state.dragItemNewOrder]),
+    state.items
+  ),
 });
 
-const resetOverItem = state => {
+const resetOverItem = (state) => {
   state.setOverItem(null);
   return state;
 };
 
-const onRearrange = state => {
+const onRearrange = (state) => {
   state.onRearrange(state);
   return {
     ...state,
@@ -55,7 +59,7 @@ const onRearrange = state => {
     overItemId: null,
     overItemIndex: null,
     dragItemPrevOrder: null,
-    dragItemNewOrder: null
+    dragItemNewOrder: null,
   };
 };
 
