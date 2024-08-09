@@ -5,7 +5,7 @@
 
 ## Examples
 
-First demo: https://rudl.netlify.com/
+First demo: https://rudl.netlify.app/
 
 ## Overview
 
